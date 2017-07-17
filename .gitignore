@@ -1,0 +1,9 @@
+.idea/*
+
+node_modules/*
+
+bundle*.js
+.babel*
+
+.DS_Store*
+.DS_Store*
