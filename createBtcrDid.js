@@ -158,7 +158,7 @@ let wif = process.env.WIF;
 connector.getUnspentOutputs(inputAddress)
   .then(unspentOutput => {
     let change = unspentOutput.amount - fee; // BTC
-    let changeSatoshi = change * SATOSHIS_PER_BTC; // SATOSHI
+    let changeSatoshi = Math.round(change * SATOSHIS_PER_BTC); // SATOSHI
     let signedHexTx = createDidTx(chain, wif, unspentOutput.txid, changeAddress, ddo1Ref, changeSatoshi);
     connector.broadcast(signedHexTx)
       .then(result => {
