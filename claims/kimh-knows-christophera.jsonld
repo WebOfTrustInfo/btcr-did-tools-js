@@ -1,0 +1,26 @@
+{
+  "@context": [
+    "https://schema.org/",
+    "https://w3id.org/security/v1"
+  ],
+  "id": "did:btcr:xgjd-xzvz-qq03-7as7/1#kimh-knows-christophera",
+  "type": [
+    "Credential",
+    "Identity",
+    "Person"
+  ],
+  "issuer": "did:btcr:xgjd-xzvz-qq03-7as7/0#did-transaction-key",
+  "issued": "2017-07-17",
+  "label": "kimh-knows-christophera",
+  "claim": {
+    "knows": "did:btcr:xyv2-xzyq-qqm5-tyke",
+    "relationship": "colleague",
+    "alternate-name": "christophera"
+  },
+  "signature": {
+    "type": "EcdsaKoblitzSignature2016",
+    "created": "2017-07-17T23:42:43Z",
+    "creator": "ecdsa-koblitz-pubkey:0448a4dda164e15ae8fb73689bcff2b35c95acca063c07b7fd74ab439176298ebeb0f265fddca4d0c5d755047893b1ee1b6b9ab704381d59ff1c6e70ef1e16ea78",
+    "signatureValue": "G4QfmiCibSYU6JN9njppdLkwuXExS1Qkj81YI/foHwyAZRUabNDGV1gLWC1/24PGgOqEIQsXULeCo5Uc7NkqGvk="
+  }
+}
