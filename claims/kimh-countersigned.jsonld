@@ -26,9 +26,9 @@
     },
     {
       "type": "EcdsaKoblitzSignature2016",
-      "created": "2017-07-17T23:47:42Z",
-      "creator": "ecdsa-koblitz-pubkey:0448a4dda164e15ae8fb73689bcff2b35c95acca063c07b7fd74ab439176298ebeb0f265fddca4d0c5d755047893b1ee1b6b9ab704381d59ff1c6e70ef1e16ea78",
-      "signatureValue": "HA9z363kP8o5dOXD3HCyIKpmZCylxyMqSlsUsxD5vtuRXImgaM1H7GJYixUFKhHmm+3KzXNJzAu8jX4mUd7uxDQ="
+      "created": "2017-07-18T02:01:20Z",
+      "creator": "ecdsa-koblitz-pubkey:0248a4dda164e15ae8fb73689bcff2b35c95acca063c07b7fd74ab439176298ebe",
+      "signatureValue": "Gwzktt/2QcNV87y7oBhKBMqyIJ89FbCOcAC11OazxUN0GBDX0obmXAT5XN8FQuN+Yq6TtDq/IvHWcm2xoRtjRkg="
     }
   ]
 }

@@ -8,11 +8,6 @@ let wif = process.env.WIF;
 
 let network = bitcoin.networks.testnet;
 
-// TODO: I'm not sure if this is correct
-let keyPair = bitcoin.ECPair.fromWIF(wif, network);
-let publicKeyBuffer = keyPair.getPublicKeyBuffer();
-let publicKeyHex = publicKeyBuffer.toString("hex");
-
 
 let label = "kimh-knows-christophera";
 let did = "did:btcr:xgjd-xzvz-qq03-7as7";
@@ -37,6 +32,12 @@ let claim = {
     "alternate-name": alternateName
   }
 };
+
+// get public key
+let keyPair = bitcoin.ECPair.fromWIF(wif, network);
+keyPair.compressed = true;
+let publicKeyBuffer = keyPair.getPublicKeyBuffer();
+let publicKeyHex = publicKeyBuffer.toString('hex');
 
 let testPublicKeyFriendly = "ecdsa-koblitz-pubkey:" + publicKeyHex;
 
@@ -82,8 +83,10 @@ jsig.sign(claim, {
     "creator": "ecdsa-koblitz-pubkey:036abdaaa4db47ba2c0b81ad9bbf7be85d04f0fd50a62c6754499ac299a7647270",
     "signatureValue": "IPYL4YW8/G0m+EFiGBWoyF3rC3xqDntN2pZesAZFLwrVDg7OfB2KPtKPBBwMvcAWfroqKdY0m1Z8lJae0dlHvyQ="
   };
-  signedDocument.signature = [originalSignature, signature];
-  */
+  signedDocument.signature = [originalSignature, signature];*/
+
 
   console.log(JSON.stringify(signedDocument, null, 4));
 });
+
+//0448a4dda164e15ae8fb73689bcff2b35c95acca063c07b7fd74ab439176298ebeb0f265fddca4d0c5d755047893b1ee1b6b9ab704381d59ff1c6e70ef1e16ea78
