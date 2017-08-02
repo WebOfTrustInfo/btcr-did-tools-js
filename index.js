@@ -65,7 +65,7 @@ const toDeterministicDid = function (txDetails, txref) {
             "id": ownerDid,
             "type": ["CryptographicKey", "EdDsaSAPublicKey", "update-proof"],
             "curve": "secp256k1",
-            "publicKeyHex": pubKey
+            "publicKeyHex": pubKey.toString()
           }
         ],
         "control": [
@@ -167,11 +167,10 @@ module.exports = {
   getDeterministicDdoFromTxid: getDeterministicDdoFromTxid
 };
 
-/*
+
 getDeterministicDdoFromTxref("txtest1-xyv2-xzyq-qqm5-tyke").then(dddo => {
   console.log(dddo);
 }, error => {
   console.error(error)
 });
-*/
 

@@ -212,7 +212,7 @@ var toDeterministicDid = function toDeterministicDid(txDetails, txref) {
         "id": ownerDid,
         "type": ["CryptographicKey", "EdDsaSAPublicKey", "update-proof"],
         "curve": "secp256k1",
-        "publicKeyHex": pubKey
+        "publicKeyHex": pubKey.toString()
       }],
       "control": [{
         "control-bond": parseFloat(outputValue.toFixed(COIN_DECIMAL_PRECISION)),
@@ -301,13 +301,11 @@ module.exports = {
   getDeterministicDdoFromTxid: getDeterministicDdoFromTxid
 };
 
-/*
-getDeterministicDdoFromTxref("txtest1-xyv2-xzyq-qqm5-tyke").then(dddo => {
+getDeterministicDdoFromTxref("txtest1-xyv2-xzyq-qqm5-tyke").then(function (dddo) {
   console.log(dddo);
-}, error => {
-  console.error(error)
+}, function (error) {
+  console.error(error);
 });
-*/
 
 }).call(this,require("buffer").Buffer)
 },{"./createBtcrDid":1,"./signClaim":138,"buffer":54,"txref-conversion-js":123}],3:[function(require,module,exports){
