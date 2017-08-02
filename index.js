@@ -6,14 +6,15 @@ const txRefConversion = require("txref-conversion-js");
 let COIN_DECIMAL_PRECISION = 4;
 let COMPRESSED_PUBLIC_KEY_BYTE_LEN = 33;
 let COMPRESSED_PUBLIC_KEY_HEX_LEN = COMPRESSED_PUBLIC_KEY_BYTE_LEN * 2;
+let SATOSHI_TO_BTC = 0.00000001;
 
-const extractCompressedPublicKey = function(script) {
+const extractCompressedPublicKey = function (script) {
   const b = new Buffer(script);
 
   const startIndex = b.length - COMPRESSED_PUBLIC_KEY_HEX_LEN;
   const pub = b.slice(startIndex);
   return pub;
-}
+};
 
 
 const toDeterministicDid = function (txDetails, txref) {
@@ -27,7 +28,7 @@ const toDeterministicDid = function (txDetails, txref) {
 
   return txRefConversion.txidToTxref(fundingTxid, txDetails.chain)
     .then(fundingTxref => {
-      const inputValue = txDetails.inputs[0].outputValue * 0.00000001;
+      const inputValue = txDetails.inputs[0].outputValue * SATOSHI_TO_BTC;
       const ownerDid = "did:btcr:" + txref.substring(txref.indexOf('-') + 1);
 
       let ddoHex = null;
@@ -44,7 +45,7 @@ const toDeterministicDid = function (txDetails, txref) {
           ddoText = output.dataString;
         } else {
           proofType = output.scriptType;
-          outputValue = output.outputValue * 0.00000001;
+          outputValue = output.outputValue * SATOSHI_TO_BTC;
           outputAddress = output.addresses[0];
         }
       }
@@ -102,42 +103,41 @@ const toDeterministicDid = function (txDetails, txref) {
       result.signature = signature;
 
       return result;
-    }, error => {
+    })
+    .catch(error => {
       console.error(error);
       throw error;
     });
 };
 
+const chainDdo = function (formatted, txDetails) {
+  if (formatted.ddo['more-ddo-txt'] != null) {
+    return txRefConversion.promisifiedRequest({"url": formatted.ddo['more-ddo-txt']})
+      .then(frag1 => {
+        return {
+          "txDetails": txDetails,
+          "deterministicDdo": formatted,
+          "fragment1": JSON.parse(frag1)
+        };
+      })
+  } else {
+    return {
+      "txDetails": txDetails,
+      "deterministicDdo": formatted
+    };
+  }
+};
 
 const getDeterministicDdoFromTxref = function (txref) {
   return txRefConversion.txDetailsFromTxref(txref)
     .then(txDetails => {
+      this.txDetails = txDetails;
       return toDeterministicDid(txDetails, txref)
-        .then(formatted => {
-          if (formatted.ddo['more-ddo-txt'] != null) {
-            return txRefConversion.promisifiedRequest({"url": formatted.ddo['more-ddo-txt']})
-              .then(frag1 => {
-                return {
-                  "txDetails": txDetails,
-                  "deterministicDdo": formatted,
-                  "fragment1": JSON.parse(frag1)
-                };
-
-              }, error => {
-                console.error(error);
-                throw error;
-              })
-          } else {
-            return {
-              "txDetails": txDetails,
-              "deterministicDdo": formatted
-            };
-          }
-        }, error => {
-          console.error(error);
-          throw error;
-        });
-    }, error => {
+    })
+    .then(formatted => {
+      return chainDdo(formatted, this.txDetails);
+    })
+    .catch(error => {
       console.error(error);
       throw error;
     });
@@ -147,32 +147,13 @@ const getDeterministicDdoFromTxref = function (txref) {
 const getDeterministicDdoFromTxid = function (txid, chain) {
   return txRefConversion.txDetailsFromTxid(txid, chain)
     .then(txDetails => {
+      this.txDetails = txDetails;
       return toDeterministicDid(txDetails, txDetails.txref)
-        .then(formatted => {
-          if (formatted.ddo['more-ddo-txt'] != null) {
-            return txRefConversion.promisifiedRequest({"url": formatted.ddo['more-ddo-txt']})
-              .then(frag1 => {
-                return {
-                  "txDetails": txDetails,
-                  "deterministicDdo": formatted,
-                  "fragment1": JSON.parse(frag1)
-                };
-
-              }, err => {
-                console.error(error);
-                throw error;
-              })
-          } else {
-            return {
-              "txDetails": txDetails,
-              "deterministicDdo": formatted
-            };
-          }
-        }, error => {
-          console.error(error);
-          throw error;
-        });
-    }, error => {
+    })
+    .then(formatted => {
+      return chainDdo(formatted, this.txDetails);
+    })
+    .catch(error => {
       console.error(error);
       throw error;
     });
@@ -186,11 +167,11 @@ module.exports = {
   getDeterministicDdoFromTxid: getDeterministicDdoFromTxid
 };
 
-
+/*
 getDeterministicDdoFromTxref("txtest1-xyv2-xzyq-qqm5-tyke").then(dddo => {
   console.log(dddo);
 }, error => {
   console.error(error)
 });
-
+*/
 

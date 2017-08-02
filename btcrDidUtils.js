@@ -146,6 +146,7 @@ module.exports = {
 
 }).call(this,require('_process'),require("buffer").Buffer)
 },{"_process":84,"bitcoinjs-lib":21,"buffer":54,"commander":57,"txref-conversion-js":123}],2:[function(require,module,exports){
+(function (Buffer){
 "use strict";
 
 var createBtcrDid = require("./createBtcrDid");
@@ -153,6 +154,17 @@ var signClaim = require("./signClaim");
 var txRefConversion = require("txref-conversion-js");
 
 var COIN_DECIMAL_PRECISION = 4;
+var COMPRESSED_PUBLIC_KEY_BYTE_LEN = 33;
+var COMPRESSED_PUBLIC_KEY_HEX_LEN = COMPRESSED_PUBLIC_KEY_BYTE_LEN * 2;
+var SATOSHI_TO_BTC = 0.00000001;
+
+var extractCompressedPublicKey = function extractCompressedPublicKey(script) {
+  var b = new Buffer(script);
+
+  var startIndex = b.length - COMPRESSED_PUBLIC_KEY_HEX_LEN;
+  var pub = b.slice(startIndex);
+  return pub;
+};
 
 var toDeterministicDid = function toDeterministicDid(txDetails, txref) {
   var result = {
@@ -160,9 +172,11 @@ var toDeterministicDid = function toDeterministicDid(txDetails, txref) {
   };
 
   var fundingTxid = txDetails.inputs[0].previousHash;
+  var fundingScript = txDetails.inputs[0].script;
+  var pubKey = extractCompressedPublicKey(fundingScript);
 
   return txRefConversion.txidToTxref(fundingTxid, txDetails.chain).then(function (fundingTxref) {
-    var inputValue = txDetails.inputs[0].outputValue * 0.00000001;
+    var inputValue = txDetails.inputs[0].outputValue * SATOSHI_TO_BTC;
     var ownerDid = "did:btcr:" + txref.substring(txref.indexOf('-') + 1);
 
     var ddoHex = null;
@@ -179,7 +193,7 @@ var toDeterministicDid = function toDeterministicDid(txDetails, txref) {
         ddoText = output.dataString;
       } else {
         proofType = output.scriptType;
-        outputValue = output.outputValue * 0.00000001;
+        outputValue = output.outputValue * SATOSHI_TO_BTC;
         outputAddress = output.addresses[0];
       }
     }
@@ -198,7 +212,7 @@ var toDeterministicDid = function toDeterministicDid(txDetails, txref) {
         "id": ownerDid,
         "type": ["CryptographicKey", "EdDsaSAPublicKey", "update-proof"],
         "curve": "secp256k1",
-        "publicKeyHex": "todo"
+        "publicKeyHex": pubKey
       }],
       "control": [{
         "control-bond": parseFloat(outputValue.toFixed(COIN_DECIMAL_PRECISION)),
@@ -229,67 +243,52 @@ var toDeterministicDid = function toDeterministicDid(txDetails, txref) {
     result.signature = signature;
 
     return result;
-  }, function (error) {
+  }).catch(function (error) {
     console.error(error);
     throw error;
   });
 };
 
-var getDeterministicDdoFromTxref = function getDeterministicDdoFromTxref(txref) {
-  return txRefConversion.txDetailsFromTxref(txref).then(function (txDetails) {
-    return toDeterministicDid(txDetails, txref).then(function (formatted) {
-      if (formatted.ddo['more-ddo-txt'] != null) {
-        return txRefConversion.promisifiedRequest({ "url": formatted.ddo['more-ddo-txt'] }).then(function (frag1) {
-          return {
-            "txDetails": txDetails,
-            "deterministicDdo": formatted,
-            "fragment1": JSON.parse(frag1)
-          };
-        }, function (error) {
-          console.error(error);
-          throw error;
-        });
-      } else {
-        return {
-          "txDetails": txDetails,
-          "deterministicDdo": formatted
-        };
-      }
-    }, function (error) {
-      console.error(error);
-      throw error;
+var chainDdo = function chainDdo(formatted, txDetails) {
+  if (formatted.ddo['more-ddo-txt'] != null) {
+    return txRefConversion.promisifiedRequest({ "url": formatted.ddo['more-ddo-txt'] }).then(function (frag1) {
+      return {
+        "txDetails": txDetails,
+        "deterministicDdo": formatted,
+        "fragment1": JSON.parse(frag1)
+      };
     });
-  }, function (error) {
+  } else {
+    return {
+      "txDetails": txDetails,
+      "deterministicDdo": formatted
+    };
+  }
+};
+
+var getDeterministicDdoFromTxref = function getDeterministicDdoFromTxref(txref) {
+  var _this = this;
+
+  return txRefConversion.txDetailsFromTxref(txref).then(function (txDetails) {
+    _this.txDetails = txDetails;
+    return toDeterministicDid(txDetails, txref);
+  }).then(function (formatted) {
+    return chainDdo(formatted, _this.txDetails);
+  }).catch(function (error) {
     console.error(error);
     throw error;
   });
 };
 
 var getDeterministicDdoFromTxid = function getDeterministicDdoFromTxid(txid, chain) {
+  var _this2 = this;
+
   return txRefConversion.txDetailsFromTxid(txid, chain).then(function (txDetails) {
-    return toDeterministicDid(txDetails, txDetails.txref).then(function (formatted) {
-      if (formatted.ddo['more-ddo-txt'] != null) {
-        return txRefConversion.promisifiedRequest({ "url": formatted.ddo['more-ddo-txt'] }).then(function (frag1) {
-          return {
-            "txDetails": txDetails,
-            "deterministicDdo": formatted,
-            "fragment1": JSON.parse(frag1)
-          };
-        }, function (err) {
-          console.error(error);
-          throw error;
-        });
-      } else {
-        return {
-          "txDetails": txDetails,
-          "deterministicDdo": formatted
-        };
-      }
-    }, function (error) {
-      console.error(error);
-      throw error;
-    });
-  }, function (error) {
+    _this2.txDetails = txDetails;
+    return toDeterministicDid(txDetails, txDetails.txref);
+  }).then(function (formatted) {
+    return chainDdo(formatted, _this2.txDetails);
+  }).catch(function (error) {
     console.error(error);
     throw error;
   });
@@ -310,7 +309,8 @@ getDeterministicDdoFromTxref("txtest1-xyv2-xzyq-qqm5-tyke").then(dddo => {
 });
 */
 
-},{"./createBtcrDid":1,"./signClaim":138,"txref-conversion-js":123}],3:[function(require,module,exports){
+}).call(this,require("buffer").Buffer)
+},{"./createBtcrDid":1,"./signClaim":138,"buffer":54,"txref-conversion-js":123}],3:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -28387,11 +28387,11 @@ var txDetailsFromTxref = function (txref) {
           return txDetails;
         }, error => {
           console.error(error);
-          reject(error);
+          throw error;
         });
     }, error => {
       console.error(error);
-      reject(error);
+      throw error;
     })
 };
 
