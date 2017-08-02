@@ -1,38 +1,11 @@
-var bitcoin = require('bitcoinjs-lib');
-var program = require('commander');
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+const bitcoin = require('bitcoinjs-lib');
+const program = require('commander');
+const request = require("txref-conversion-js").promisifiedRequest;
 
 
 const MAINNET_BLOCKR_IO = "https://btc.blockr.io/api/v1";
 const TESTNET_BLOCKR_IO = "https://tbtc.blockr.io/api/v1";
 const SATOSHIS_PER_BTC = 100000000;
-
-
-let request = obj => {
-  return new Promise((resolve, reject) => {
-    let request = new XMLHttpRequest();
-
-    request.addEventListener('load', () => {
-      if (request.status >= 200 && request.status < 300) {
-        resolve(request.responseText);
-      } else {
-        reject(new Error(request.responseText));
-      }
-    });
-    request.addEventListener('error', () => {
-      console.error(request.status);
-      reject(new Error(request.status));
-    });
-
-    request.open(obj.method || "GET", obj.url);
-    request.responseType = "json";
-    if (obj.body !== null) {
-      request.send(JSON.stringify(obj.body));
-    } else {
-      request.send();
-    }
-  });
-};
 
 
 class UnspentOut {
@@ -100,77 +73,83 @@ class BlockrIOBroadcaster {
 }
 
 
-var createDidTx = function (network, wif, inputTxid, outputAddress, ddo1Ref, changeAmount) {
+const createDidTx = function (network, wif, inputTxid, outputAddress, ddo1Ref, changeAmount) {
   let tx = new bitcoin.TransactionBuilder(network);
   tx.addInput(inputTxid, 0);
   tx.addOutput(outputAddress, changeAmount);
 
-  if (ddo1Ref !== null) {
+  if (ddo1Ref != null) {
     let data = new Buffer(ddo1Ref);
-    ret = bitcoin.script.compile(
+    let ret = bitcoin.script.compile(
       [
         bitcoin.opcodes.OP_RETURN,
         data
       ]);
     tx.addOutput(ret, 0);
   }
-  key = bitcoin.ECPair.fromWIF(wif, network);
+  let key = bitcoin.ECPair.fromWIF(wif, network);
   tx.sign(0, key);
   return tx.build().toHex();
-}
+};
 
 
 
-var inputAddress = null;
-var changeAddress = null;
-var ddo1Ref = null;
-var fee = 0;
-var chain = null;
+let inputAddress = null;
+let changeAddress = null;
+let ddo1Ref = null;
+let fee = 0;
+let chain = null;
 
 
-program
-  .version('1.0.0')
-  .usage('[options]')
-  .option('-i, --inputAddress <inputAddress>', 'input (funding) address; required')
-  .option('-c, --changeAddress <changeAddress>', 'change address; required')
-  .option('-n, --network <network>', 'testnet or mainnet; default is testnet', 'testnet')
-  .option('-d, --ddo1Ref <ddo1Ref>', 'DDO/1 reference; will be added to the OP_RETURN field. Can be null')
-  .option('-f, --fee <fee>', 'Transaction fee in BTC. Default is 0.001 BTC', 0.001);
+const createBtcrDid = function () {
 
-program.parse(process.argv);
+  program
+    .version('1.0.0')
+    .usage('[options]')
+    .option('-i, --inputAddress <inputAddress>', 'input (funding) address; required')
+    .option('-c, --changeAddress <changeAddress>', 'change address; required')
+    .option('-n, --network <network>', 'testnet or mainnet; default is testnet', 'testnet')
+    .option('-d, --ddo1Ref <ddo1Ref>', 'DDO/1 reference; will be added to the OP_RETURN field. Can be null')
+    .option('-f, --fee <fee>', 'Transaction fee in BTC. Default is 0.001 BTC', 0.001);
 
-inputAddress = program.inputAddress;
-changeAddress = program.changeAddress;
-ddo1Ref = program.ddo1Ref;
-fee = program.fee;
-chain = program.network === "mainnet" ? bitcoin.networks.mainnet : bitcoin.networks.testnet;
+  program.parse(process.argv);
 
-if (inputAddress === null || changeAddress === null) {
-  program.help();
-  process.exit(1);
-}
+  inputAddress = program.inputAddress;
+  changeAddress = program.changeAddress;
+  ddo1Ref = program.ddo1Ref;
+  fee = program.fee;
+  chain = program.network === "mainnet" ? bitcoin.networks.mainnet : bitcoin.networks.testnet;
 
-let baseUrl = chain === bitcoin.networks.bitcoin ? MAINNET_BLOCKR_IO : TESTNET_BLOCKR_IO;
-let connector = new BlockrIOBroadcaster(baseUrl);
+  if (inputAddress === null || changeAddress === null) {
+    program.help();
+    process.exit(1);
+  }
 
-let wif = process.env.WIF;
+  let baseUrl = chain === bitcoin.networks.bitcoin ? MAINNET_BLOCKR_IO : TESTNET_BLOCKR_IO;
+  let connector = new BlockrIOBroadcaster(baseUrl);
 
-connector.getUnspentOutputs(inputAddress)
-  .then(unspentOutput => {
-    let change = unspentOutput.amount - fee; // BTC
-    let changeSatoshi = Math.round(change * SATOSHIS_PER_BTC); // SATOSHI
-    let signedHexTx = createDidTx(chain, wif, unspentOutput.txid, changeAddress, ddo1Ref, changeSatoshi);
-    connector.broadcast(signedHexTx)
-      .then(result => {
-        console.log(result);
-        return result;
-      }, error => {
-        console.error(error);
-        throw error;
-      });
+  let wif = process.env.WIF;
 
-  }, error => {
-    console.error(error);
-    throw error;
-  });
+  return connector.getUnspentOutputs(inputAddress)
+    .then(unspentOutput => {
+      let change = unspentOutput.amount - fee; // BTC
+      let changeSatoshi = Math.round(change * SATOSHIS_PER_BTC); // SATOSHI
+      let signedHexTx = createDidTx(chain, wif, unspentOutput.txid, changeAddress, ddo1Ref, changeSatoshi);
+      connector.broadcast(signedHexTx)
+        .then(result => {
+          console.log(result);
+          return result;
+        }, error => {
+          console.error(error);
+          throw error;
+        });
 
+    }, error => {
+      console.error(error);
+      throw error;
+    });
+};
+
+module.exports = {
+  createBtcrDid: createBtcrDid
+};

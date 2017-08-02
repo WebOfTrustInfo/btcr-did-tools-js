@@ -1,7 +1,6 @@
-var bitcoin = require('bitcoinjs-lib');
-var jsonld = require('jsonld');
-var jsig = require('jsonld-signatures');
-jsig.use('jsonld', jsonld);
+const bitcoin = require('bitcoinjs-lib');
+const jsonld = require('jsonld');
+const jsig = require('jsonld-signatures');
 
 let counterSign = false;
 
@@ -18,7 +17,7 @@ let relationship = "colleague";
 let issuedDate = "2017-07-17";
 let alternateName = "christophera";
 
-var claim = null;
+let claim = null;
 if (counterSign) {
   claim = {
     "@context": [
@@ -62,30 +61,38 @@ if (counterSign) {
   };
 }
 
+
+const signClaim = function () {
 // get public key
-let keyPair = bitcoin.ECPair.fromWIF(wif, network);
-keyPair.compressed = true;
-let publicKeyBuffer = keyPair.getPublicKeyBuffer();
-let publicKeyHex = publicKeyBuffer.toString('hex');
+  let keyPair = bitcoin.ECPair.fromWIF(wif, network);
+  keyPair.compressed = true;
+  let publicKeyBuffer = keyPair.getPublicKeyBuffer();
+  let publicKeyHex = publicKeyBuffer.toString('hex');
 
-let testPublicKeyFriendly = "ecdsa-koblitz-pubkey:" + publicKeyHex;
+  let testPublicKeyFriendly = "ecdsa-koblitz-pubkey:" + publicKeyHex;
 
-let originalSignature = claim.signature;
-jsig.sign(claim, {
-  algorithm: 'EcdsaKoblitzSignature2016',
-  privateKeyWif: wif,
-  creator: testPublicKeyFriendly
-}, function (err, signedDocument) {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
+  let originalSignature = claim.signature;
+  jsig.use('jsonld', jsonld);
+  jsig.sign(claim, {
+    algorithm: 'EcdsaKoblitzSignature2016',
+    privateKeyWif: wif,
+    creator: testPublicKeyFriendly
+  }, function (err, signedDocument) {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
 
-  if (counterSign) {
-    // add back original signature if counter signing
-    var signature = signedDocument.signature;
-    signedDocument.signature = [originalSignature, signature];
-  }
+    if (counterSign) {
+      // add back original signature if counter signing
+      const signature = signedDocument.signature;
+      signedDocument.signature = [originalSignature, signature];
+    }
 
-  console.log(JSON.stringify(signedDocument, null, 4));
-});
+    console.log(JSON.stringify(signedDocument, null, 4));
+  });
+};
+
+module.exports = {
+  signClaim: signClaim
+};
