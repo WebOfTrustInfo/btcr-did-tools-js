@@ -62,11 +62,20 @@ const toDeterministicDid = function (txDetails, txref) {
         "more-ddo-txt": ddoText,
         "owner": [
           {
-            "id": ownerDid,
+            "id": ownerDid + "/0#transaction-key",
             "type": ["CryptographicKey", "EdDsaSAPublicKey", "update-proof"],
             "curve": "secp256k1",
             "publicKeyHex": pubKey.toString()
           }
+        ],
+
+        "claim-issuer": [
+          { 
+            "id": ownerDid + "/0#transaction-key", 
+            "type": [ "CryptographicKey",  "EdDsaSAPublicKey",  "update-proof" ], 
+            "curve": "secp256k1", 
+            "publicKeyHex": pubKey.toString()
+          } 
         ],
         "control": [
           {
@@ -167,10 +176,9 @@ module.exports = {
   getDeterministicDdoFromTxid: getDeterministicDdoFromTxid
 };
 
-
+/*
 getDeterministicDdoFromTxref("txtest1-xyv2-xzyq-qqm5-tyke").then(dddo => {
   console.log(dddo);
 }, error => {
   console.error(error)
-});
-
+});*/

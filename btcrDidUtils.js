@@ -209,9 +209,20 @@ var toDeterministicDid = function toDeterministicDid(txDetails, txref) {
       "more-ddo-asm": ddoAsm,
       "more-ddo-txt": ddoText,
       "owner": [{
-        "id": ownerDid,
+        "id": ownerDid + "/0#transaction-key",
         "type": ["CryptographicKey", "EdDsaSAPublicKey", "update-proof"],
         "curve": "secp256k1",
+        "publicKeyHex": pubKey.toString()
+      }],
+
+      "claim-issuer": [{
+
+        "id": ownerDid + "/0#transaction-key",
+
+        "type": ["CryptographicKey", "EdDsaSAPublicKey", "update-proof"],
+
+        "curve": "secp256k1",
+
         "publicKeyHex": pubKey.toString()
       }],
       "control": [{
@@ -301,11 +312,12 @@ module.exports = {
   getDeterministicDdoFromTxid: getDeterministicDdoFromTxid
 };
 
-getDeterministicDdoFromTxref("txtest1-xyv2-xzyq-qqm5-tyke").then(function (dddo) {
+/*
+getDeterministicDdoFromTxref("txtest1-xyv2-xzyq-qqm5-tyke").then(dddo => {
   console.log(dddo);
-}, function (error) {
-  console.error(error);
-});
+}, error => {
+  console.error(error)
+});*/
 
 }).call(this,require("buffer").Buffer)
 },{"./createBtcrDid":1,"./signClaim":138,"buffer":54,"txref-conversion-js":123}],3:[function(require,module,exports){
