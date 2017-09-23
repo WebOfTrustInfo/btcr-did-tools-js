@@ -24,14 +24,14 @@ export WIF=<privateKeyWif>
 ## Create BTCR DID with DDO/1 ref
 
 ```
-node createBtcrDid.js -i <inputAddress> -c <changeAddress> -d <link-to-ddo.jsonld>
+node createBtcrDidCmd.js -i <inputAddress> -c <changeAddress> -d <link-to-ddo.jsonld>
 
 ```
 
 ## Create BTCR DID without DDO/1 ref
 
 ```
-node createBtcrDid.js -i <inputAddress> -c <changeAddress>
+node createBtcrDidCmd.js -i <inputAddress> -c <changeAddress>
 
 ```
 
@@ -42,6 +42,14 @@ The default node is testnet; call `--help` for more options
 ```
 node createBtcrDid.js --help
 ```
+
+## Get hex-encoded public ket from wif
+
+```
+node utilCmd.js -n <mainnet|testnet>
+
+```
+
 
 ## Getting started with Bitcoin and testnet
 

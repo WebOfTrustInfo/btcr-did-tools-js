@@ -16,7 +16,6 @@ const extractCompressedPublicKey = function (script) {
   return pub;
 };
 
-
 const toDeterministicDid = function (txDetails, txref) {
   const result = {
     "@context": ["https://schema.org/", "https://w3id.org/security/v1"]
