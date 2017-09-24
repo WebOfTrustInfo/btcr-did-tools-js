@@ -137,7 +137,7 @@ async function toDeterministicDid(txDetails, txref) {
 }
 
 async function getDeterministicDdoFromTxref(txref) {
-  let txDetails = await txRefConversion.txDetailsFromTxref(txref, chain);
+  let txDetails = await txRefConversion.txDetailsFromTxref(txref);
   let deterministicDid = await toDeterministicDid(txDetails, txref);
   return {
     "txDetails": txDetails,
@@ -157,7 +157,7 @@ async function getDeterministicDdoFromTxid(txid, chain) {
 // kim current: 67c0ee676221d9e0e08b98a55a8bf8add9cba854f13dda393e38ffa1b982b833
 // christopher past: f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107
 /*
-getDeterministicDdoFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107").then(dddo => {
+getDeterministicDdoFromTxref("txtest1-xkyt-fzgq-qq87-xnhn").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
