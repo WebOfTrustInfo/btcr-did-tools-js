@@ -17,12 +17,13 @@ class UnspentOut {
    * @param numConfirmations
    * @param script
    */
-  constructor(address, txid, amount, numConfirmations, script) {
+  constructor(address, txid, amount, numConfirmations, script, index) {
     this.address = address;
     this.txid = txid;
     this.amount = amount;
     this.numConfirmations = numConfirmations;
     this.script = script;
+    this.index = index;
   }
 }
 
@@ -49,7 +50,8 @@ class ChainSoConnector {
           firstUnspent.txid,
           firstUnspent.value,
           firstUnspent.confirmations,
-          firstUnspent.script_hex);
+          firstUnspent.script_hex,
+          firstUnspent.output_no);
       }).catch((err) => {
         console.error(err);
         throw err;
@@ -75,9 +77,9 @@ class ChainSoConnector {
 }
 
 
-const createDidTx = function (network, wif, inputTxid, outputAddress, ddo1Ref, changeAmount) {
+const createDidTx = function (network, wif, unspentOutput, outputAddress, ddo1Ref, changeAmount) {
   let tx = new bitcoin.TransactionBuilder(network);
-  tx.addInput(inputTxid, 0);
+  tx.addInput(unspentOutput.txid, unspentOutput.index);
   tx.addOutput(outputAddress, changeAmount);
 
   if (ddo1Ref != null) {
@@ -96,15 +98,16 @@ const createDidTx = function (network, wif, inputTxid, outputAddress, ddo1Ref, c
 
 
 const createBtcrDid = function(inputAddress, changeAddress, network, wif, ddo1Ref, fee) {
+  let theNetwork = network === "mainnet" ? bitcoin.networks.mainnet : bitcoin.networks.testnet;
 
-  let connector = new ChainSoConnector(network);
+  let connector = new ChainSoConnector(theNetwork);
 
   return new Promise((resolve, reject) => {
     connector.getUnspentOutputs(inputAddress)
         .then(unspentOutput => {
           let change = unspentOutput.amount - fee; // BTC
           let changeSatoshi = Math.round(change * SATOSHIS_PER_BTC); // SATOSHI
-          let signedHexTx = createDidTx(network, wif, unspentOutput.txid, changeAddress, ddo1Ref, changeSatoshi);
+          let signedHexTx = createDidTx(theNetwork, wif, unspentOutput, changeAddress, ddo1Ref, changeSatoshi);
           connector.broadcast(signedHexTx)
               .then(result => {
                 console.log("transaction details:" + result);

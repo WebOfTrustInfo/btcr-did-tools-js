@@ -1,4 +1,3 @@
-const bitcoin = require('bitcoinjs-lib');
 const program = require('commander');
 const createBtcrDid = require('./createBtcrDid');
 
@@ -24,7 +23,6 @@ inputAddress = program.inputAddress;
 changeAddress = program.changeAddress;
 ddo1Ref = program.ddo1Ref;
 fee = program.fee;
-chain = program.network === "mainnet" ? bitcoin.networks.mainnet : bitcoin.networks.testnet;
 let wif = process.env.WIF;
 
 if (inputAddress === null || changeAddress === null|| wif === null) {

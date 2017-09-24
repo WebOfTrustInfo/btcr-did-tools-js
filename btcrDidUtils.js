@@ -23,7 +23,7 @@ var UnspentOut =
  * @param numConfirmations
  * @param script
  */
-function UnspentOut(address, txid, amount, numConfirmations, script) {
+function UnspentOut(address, txid, amount, numConfirmations, script, index) {
   _classCallCheck(this, UnspentOut);
 
   this.address = address;
@@ -31,6 +31,7 @@ function UnspentOut(address, txid, amount, numConfirmations, script) {
   this.amount = amount;
   this.numConfirmations = numConfirmations;
   this.script = script;
+  this.index = index;
 };
 
 var ChainSoConnector = function () {
@@ -54,7 +55,7 @@ var ChainSoConnector = function () {
           throw Error("no unspent outputs for address " + address);
         }
         var firstUnspent = resultJson.data.txs[0];
-        return new UnspentOut(address, firstUnspent.txid, firstUnspent.value, firstUnspent.confirmations, firstUnspent.script_hex);
+        return new UnspentOut(address, firstUnspent.txid, firstUnspent.value, firstUnspent.confirmations, firstUnspent.script_hex, firstUnspent.output_no);
       }).catch(function (err) {
         console.error(err);
         throw err;
@@ -82,9 +83,9 @@ var ChainSoConnector = function () {
   return ChainSoConnector;
 }();
 
-var createDidTx = function createDidTx(network, wif, inputTxid, outputAddress, ddo1Ref, changeAmount) {
+var createDidTx = function createDidTx(network, wif, unspentOutput, outputAddress, ddo1Ref, changeAmount) {
   var tx = new bitcoin.TransactionBuilder(network);
-  tx.addInput(inputTxid, 0);
+  tx.addInput(unspentOutput.txid, unspentOutput.index);
   tx.addOutput(outputAddress, changeAmount);
 
   if (ddo1Ref != null) {
@@ -98,14 +99,15 @@ var createDidTx = function createDidTx(network, wif, inputTxid, outputAddress, d
 };
 
 var createBtcrDid = function createBtcrDid(inputAddress, changeAddress, network, wif, ddo1Ref, fee) {
+  var theNetwork = network === "mainnet" ? bitcoin.networks.mainnet : bitcoin.networks.testnet;
 
-  var connector = new ChainSoConnector(network);
+  var connector = new ChainSoConnector(theNetwork);
 
   return new Promise(function (resolve, reject) {
     connector.getUnspentOutputs(inputAddress).then(function (unspentOutput) {
       var change = unspentOutput.amount - fee; // BTC
       var changeSatoshi = Math.round(change * SATOSHIS_PER_BTC); // SATOSHI
-      var signedHexTx = createDidTx(network, wif, unspentOutput.txid, changeAddress, ddo1Ref, changeSatoshi);
+      var signedHexTx = createDidTx(theNetwork, wif, unspentOutput, changeAddress, ddo1Ref, changeSatoshi);
       connector.broadcast(signedHexTx).then(function (result) {
         console.log("transaction details:" + result);
         resolve(result);
@@ -304,8 +306,8 @@ var signClaim = require("./signClaim");
 var ddoFormatter = require("./ddoFormatter");
 
 module.exports = {
-  signClaim: signClaim,
-  createBtcrDid: createBtcrDid,
+  signClaim: signClaim.signClaim,
+  createBtcrDid: createBtcrDid.createBtcrDid,
   getDeterministicDdoFromTxref: ddoFormatter.getDeterministicDdoFromTxref,
   getDeterministicDdoFromTxid: ddoFormatter.getDeterministicDdoFromTxid
 
