@@ -35,6 +35,23 @@ node createBtcrDidCmd.js -i <inputAddress> -c <changeAddress>
 
 ```
 
+## Output
+
+The output indicates the (to-be-confirmed) txid. You need to wait for confirmations until the txref is known.
+
+You can check the transaction status at a site like [https://live.blockcypher.com/btc-testnet/](https://live.blockcypher.com/btc-testnet/)
+
+```
+transaction details:{
+  "status" : "success",
+  "data" : {
+    "network" : "BTCTEST",
+    "txid" : "67c0ee676221d9e0e08b98a55a8bf8add9cba854f13dda393e38ffa1b982b833"
+  }
+}
+
+```
+
 ## Usage
 
 The default node is testnet; call `--help` for more options
