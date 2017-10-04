@@ -126,8 +126,9 @@ async function toDeterministicDid(txDetails, txref) {
 
   const signature = {
     "type": "SatoshiBlockchainSignature2017",
-    "id": btcrDid,
     "chain": txDetails.chain,
+    "created": txDetails.txConfirmed,
+    "creator": "ecdsa-koblitz-pubkey:" + publicKeyHex,
   };
 
   result.signature = signature;
@@ -156,8 +157,16 @@ async function getDeterministicDdoFromTxid(txid, chain) {
 
 // kim current: 67c0ee676221d9e0e08b98a55a8bf8add9cba854f13dda393e38ffa1b982b833
 // christopher past: f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107
+
 /*
 getDeterministicDdoFromTxref("txtest1-xkyt-fzgq-qq87-xnhn").then(dddo => {
+  console.log(JSON.stringify(dddo, null, 4));
+}, error => {
+  console.error(error)
+});*/
+
+/*
+getDeterministicDdoFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
