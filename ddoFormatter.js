@@ -1,41 +1,11 @@
 'use strict';
 
 const txRefConversion = require("txref-conversion-js");
+const util = require("./util");
 
-let COIN_DECIMAL_PRECISION = 4;
-let COMPRESSED_PUBLIC_KEY_BYTE_LEN = 33;
-let COMPRESSED_PUBLIC_KEY_HEX_LEN = COMPRESSED_PUBLIC_KEY_BYTE_LEN * 2;
-let SATOSHI_TO_BTC = 0.00000001;
 
-const extractCompressedPublicKey = function (script) {
-  const b = new Buffer(script);
+var keyCounter = 1;
 
-  const startIndex = b.length - COMPRESSED_PUBLIC_KEY_HEX_LEN;
-  const pub = b.slice(startIndex);
-  return pub;
-};
-
-let createUpdateDdo = function (outputAddress) {
-  return {
-    "capability": "UpdateDidDescription",
-    "permittedProofType": [
-      {
-        "proofType": "SatoshiBlockchainSignature2017",
-        "authenticationCredential": [
-          {
-            "type": [
-              "EdDsaSAPublicKey",
-              "CryptographicKey"
-            ],
-            "hash-base58check": outputAddress
-          }
-        ]
-      }
-    ]
-  };
-};
-
-var keyCounter = 0;
 /**
  * For each authentication credential
  *   - if missing an owner then add it
@@ -43,127 +13,195 @@ var keyCounter = 0;
  *
  * @param authenticationCredential
  * @param btcrDid
+ * @param publicKeyHex
  * @returns fixed auth credential
  */
-let fixAuthenticationCredentials = function (authenticationCredential, btcrDid, publicKeyHex) {
-  if (!authenticationCredential) {
-    return [];
-  }
-  let fixed = authenticationCredential.reduce(
-      (r, e, i, a) => {
-        if (!e.owner) {
-          e.owner = btcrDid;
-        }
-        if (!e.id) {
-          if (e.publicKeyHex == publicKeyHex) {
-            e.id = btcrDid + "/keys/fundingKey";
-          } else {
-            keyCounter++;
-            e.id = btcrDid + "/keys/" + keyCounter.toString();
-          }
-        }
-        r.push(e);
-        return r;
-      }, []);
-  return fixed;
+let fixPublicKeys = function (publicKeys, btcrDid, publicKeyHex) {
+    if (!publicKeys) {
+        return [];
+    }
+
+    let fixed = publicKeys.reduce(
+        (r, e, i, a) => {
+            if (!e.id) {
+                throw "Error parsing supplemental DID; public key didn't contain an id"
+            }
+            if (!e.owner) {
+                e.owner = btcrDid;
+            }
+            if (e.id.endsWith("#keys-1")) {
+                throw "Error parsing supplemental DID; this tries to override key-1"
+            } else if (e.publicKeyHex == publicKeyHex) {
+                // do nothing; we've already added it
+            } else if (e.id.startsWith("did:")) {
+                // add it as is
+                r.push(e);
+            } else if (!e.id.startsWith("#")) {
+                // this is defined by the transaction; add the DID id
+                throw "Error parsing supplemental DID; doesn't correspond to an expected format";
+            } else {
+                e.id = btcrDid + e.id;
+                r.push(e);
+            }
+            return r;
+        }, []);
+    return fixed;
 };
 
 let fixPermittedProofTypes = function (permittedProofTypes, btcrDid, publicKeyHex) {
-  let fixed = permittedProofTypes.reduce(
-      (r1, e1) => {
-        var fixed2 = fixAuthenticationCredentials(e1.authenticationCredential, btcrDid, publicKeyHex);
-        r1.push(fixed2);
-        return r1;
-      }, []);
-  return fixed;
+    let fixed = permittedProofTypes.reduce(
+        (r1, e1) => {
+            var fixed = fixAuthenticationCredentials(e1.authenticationCredential, btcrDid, publicKeyHex);
+            r1.push(fixed);
+            return r1;
+        }, []);
+    return fixed;
 };
 
+/**
+ * TODO:
+ * - if mutable store, check for signature
+ * - determine how to find "did document" section from link. I.e. which type?
+ * @param implicitDdo
+ * @param txDetails
+ * @param txref
+ * @returns {Promise.<*>}
+ */
+async function addSupplementalDidDocuments(implicitDdo, txDetails, txref) {
 
-async function toDeterministicDid(txDetails, txref) {
-  const result = {
-    "@context": ["https://schema.org/", "https://w3id.org/security/v1"]
-  };
+    let ddo = implicitDdo;
 
-  let btcrDidComponent = txref.substring(txref.indexOf('-') + 1);
-  let btcrDid = "did:btcr:" + btcrDidComponent;
-  const fundingScript = txDetails.inputs[0].script;
-  let publicKeyHex = extractCompressedPublicKey(fundingScript).toString();
-  let spendOutput = txDetails.outputs.find((o) => o.addresses);
-  let proofType = spendOutput.scriptType;
-  let outputAddress = spendOutput.addresses[0];
-  let ddoUrl = txDetails.outputs.filter((o) => o.dataString).map(e => e.dataString).find(f => f);
+    if (implicitDdo.service && implicitDdo.service.length == 1 && implicitDdo.service[0].serviceEndpoint) {
+        let ddoUrl = implicitDdo.service[0].serviceEndpoint;
+        let ddo1 = await txRefConversion.promisifiedRequest({"url": ddoUrl});
+        let ddoJson = JSON.parse(ddo1).didDocument;
 
-  let ddoJson;
+        // append public keys
+        let fixedPublicKeys = fixPublicKeys(ddoJson.publicKey,
+            implicitDdo.id,
+            implicitDdo.publicKey[0].publicKeyHex);
+        fixedPublicKeys.forEach(e => ddo.publicKey.push(e));
 
-  if (ddoUrl) {
-    let ddo1 = await txRefConversion.promisifiedRequest({"url": ddoUrl});
-    ddoJson = JSON.parse(ddo1);
-  }
+        // append all authentications
+        if (ddoJson && ddoJson.authentication) {
+            ddoJson.authentication.forEach(e => ddo.authentication.push(e));
+        }
 
-  let authorizations = [];
-  // create "update" capability, which belongs to the transaction output
-  authorizations.push(createUpdateDdo(outputAddress));
+        // append all services
+        if (ddoJson && ddoJson.service) {
+            ddoJson.service.forEach(e => ddo.service.push(e));
+        }
 
-  // for each authorization, if missing an entity then add it.
-  // fix nested authorization proof types
-  if (ddoJson && ddoJson.authorization) {
-    let fixedAuthorizations = ddoJson.authorization.reduce(
-        (r, e, i, a) => {
-          if (!a.entity) {
-            e.entity = btcrDid;
-          }
-          e.permittedProofType = fixPermittedProofTypes(e.permittedProofType, btcrDid, publicKeyHex);
-          r.push(e);
-          return r;
-        }, []);
-    fixedAuthorizations.forEach(e => authorizations.push(e));
-  }
-  result.authorization = authorizations;
+        return ddo;
+    }
 
-  // fix authentication credentials
-  let fixedAuthenticationCredential = fixAuthenticationCredentials(ddoJson.authenticationCredential, btcrDid, publicKeyHex);
-  result.authenticationCredential = fixedAuthenticationCredential;
+}
 
-  const signature = {
-    "type": "SatoshiBlockchainSignature2017",
-    "chain": txDetails.chain,
-    "created": txDetails.txConfirmed,
-    "creator": "ecdsa-koblitz-pubkey:" + publicKeyHex,
-  };
 
-  result.signature = signature;
+/**
+ * TODO
+ * - Update remaining satoshi proof elements
+ * @param txDetails
+ * @param txref
+ * @returns {{@context: string, id: string, publicKey: [null], authentication: [null], SatoshiAuditTrail: [null]}}
+ */
+function toImplicitDidDocument(txDetails, txref) {
+    if (!txDetails) {
+        throw "Missing txDetails argument";
+    }
+    if (!txref) {
+        throw "Missing txref argument";
+    }
 
-  return result;
+    const result = {
+        "@context": ["https://schema.org/", "https://w3id.org/security/v1"]
+    };
 
+    let btcrDidComponent = txref.substring(txref.indexOf('-') + 1); // ?
+    let btcrDid = "did:btcr:" + btcrDidComponent;
+    let fundingScript = txDetails.inputs[0].script;
+    let publicKeyHex = util.extractPublicKeyHexFromScript(fundingScript).toString();
+    let ddoUrl = txDetails.outputs.filter((o) => o.dataString).map(e => e.dataString).find(f => f);
+
+    let ddoJson = {
+        "@context": "https://w3id.org/btcr/v1",
+        "id": btcrDid,
+        "publicKey": [{
+            "id": btcrDid + "#keys-1",
+            "owner": btcrDid,
+            "type": "EdDsaSAPublicKeySecp256k1",
+            "publicKeyHex": publicKeyHex.toString()
+        }],
+        "authentication": [{
+            "type": "EdDsaSAPublicKeySecp256k1Authentication",
+            "publicKey": "#keys-1"
+        }],
+        "SatoshiAuditTrail": [{
+            "chain": txDetails.chain,
+            "blockhash": txDetails.blockHash,
+            "blockindex": txDetails.blockIndex,
+            "outputindex": 1,
+            "blocktime": txDetails.txReceived,
+            "time": 1499501000,
+            "timereceived": txDetails.txReceived,
+            "burn-fee": -0.05
+        }]
+    };
+
+    if (ddoUrl) {
+        ddoJson.service = [{
+            "type": "BTCREndpoint",
+            "serviceEndpoint": ddoUrl,
+            "timestamp": "????"
+        }];
+    }
+
+    return ddoJson;
+}
+
+async function toDidDocument(txDetails, txref) {
+    let cleanedTxref = util.ensureTxref(txref);
+    let implicitDdo = toImplicitDidDocument(txDetails, txref);
+    let ddo = await addSupplementalDidDocuments(implicitDdo, txDetails, txref);
+    return ddo;
 }
 
 async function getDeterministicDdoFromTxref(txref) {
-  let txDetails = await txRefConversion.txDetailsFromTxref(txref);
-  let deterministicDid = await toDeterministicDid(txDetails, txref);
-  return {
-    "txDetails": txDetails,
-    "ddo": deterministicDid,
-  };
+    if (!txref) {
+        throw "Missing txref argument";
+    }
+    let txDetails = await txRefConversion.txDetailsFromTxref(txref);
+    let deterministicDid = await toDidDocument(txDetails, txref);
+    return {
+        "txDetails": txDetails,
+        "ddo": deterministicDid,
+    };
 }
 
 async function getDeterministicDdoFromTxid(txid, chain) {
-  let txDetails = await txRefConversion.txDetailsFromTxid(txid, chain);
-  let deterministicDid = await toDeterministicDid(txDetails, txDetails.txref);
-  return {
-    "txDetails": txDetails,
-    "ddo": deterministicDid,
-  };
+    if (!txid) {
+        throw "Missing txid argument";
+    }
+    if (!chain) {
+        throw "Missing chain argument";
+    }
+    let txDetails = await txRefConversion.txDetailsFromTxid(txid, chain);
+    let deterministicDid = await toDidDocument(txDetails, txDetails.txref);
+    return {
+        "txDetails": txDetails,
+        "ddo": deterministicDid,
+    };
 }
 
 // kim current: 67c0ee676221d9e0e08b98a55a8bf8add9cba854f13dda393e38ffa1b982b833
 // christopher past: f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107
 
-/*
+
 getDeterministicDdoFromTxref("txtest1-xkyt-fzgq-qq87-xnhn").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
-});*/
+});
 
 /*
 getDeterministicDdoFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
@@ -173,6 +211,6 @@ getDeterministicDdoFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f7978
 });*/
 
 module.exports = {
-  getDeterministicDdoFromTxref: getDeterministicDdoFromTxref,
-  getDeterministicDdoFromTxid: getDeterministicDdoFromTxid
+    getDeterministicDdoFromTxref: getDeterministicDdoFromTxref,
+    getDeterministicDdoFromTxid: getDeterministicDdoFromTxid
 };

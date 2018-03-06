@@ -60,7 +60,18 @@ The default node is testnet; call `--help` for more options
 node createBtcrDid.js --help
 ```
 
-## Get hex-encoded public ket from wif
+
+## Get hex-encoded public key from txref
+
+
+```
+node utilCmd.js -n <mainnet|testnet> -t <txref>
+
+```
+
+## Get hex-encoded public key from wif
+
+Assuming `process.env.WIF` contains the WIF
 
 ```
 node utilCmd.js -n <mainnet|testnet>
