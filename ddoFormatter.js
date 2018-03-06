@@ -160,7 +160,6 @@ function toImplicitDidDocument(txDetails, txref) {
 }
 
 async function toDidDocument(txDetails, txref) {
-    let cleanedTxref = util.ensureTxref(txref);
     let implicitDdo = toImplicitDidDocument(txDetails, txref);
     let ddo = await addSupplementalDidDocuments(implicitDdo, txDetails, txref);
     return ddo;
@@ -170,8 +169,9 @@ async function getDeterministicDdoFromTxref(txref) {
     if (!txref) {
         throw "Missing txref argument";
     }
-    let txDetails = await txRefConversion.txDetailsFromTxref(txref);
-    let deterministicDid = await toDidDocument(txDetails, txref);
+    let cleanedTxref = util.ensureTxref(txref);
+    let txDetails = await txRefConversion.txDetailsFromTxref(cleanedTxref);
+    let deterministicDid = await toDidDocument(txDetails, cleanedTxref);
     return {
         "txDetails": txDetails,
         "ddo": deterministicDid,
@@ -186,22 +186,20 @@ async function getDeterministicDdoFromTxid(txid, chain) {
         throw "Missing chain argument";
     }
     let txDetails = await txRefConversion.txDetailsFromTxid(txid, chain);
-    let deterministicDid = await toDidDocument(txDetails, txDetails.txref);
+    let deterministicDid = await toDidDocument(txDetails, util.ensureTxref(txDetails.txref));
     return {
         "txDetails": txDetails,
         "ddo": deterministicDid,
     };
 }
 
-// kim current: 67c0ee676221d9e0e08b98a55a8bf8add9cba854f13dda393e38ffa1b982b833
-// christopher past: f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107
 
-
-getDeterministicDdoFromTxref("txtest1-xkyt-fzgq-qq87-xnhn").then(dddo => {
+/*
+getDeterministicDdoFromTxref("did:btcr:txtest1-xkyt-fzgq-qq87-xnhn").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
-});
+});*/
 
 /*
 getDeterministicDdoFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {

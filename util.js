@@ -27,6 +27,7 @@ const ensureTxref = function (txref) {
     if (txref.startsWith(BTCR_PREFIX)) {
         return txref.substr(BTCR_PREFIX.length + 1);
     }
+    return txref;
 };
 
 async function extractPublicKeyHexFromTxref(txref) {

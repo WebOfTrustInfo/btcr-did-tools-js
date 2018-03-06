@@ -295,7 +295,6 @@ function toImplicitDidDocument(txDetails, txref) {
 }
 
 async function toDidDocument(txDetails, txref) {
-    var cleanedTxref = util.ensureTxref(txref);
     var implicitDdo = toImplicitDidDocument(txDetails, txref);
     var ddo = await addSupplementalDidDocuments(implicitDdo, txDetails, txref);
     return ddo;
@@ -305,8 +304,9 @@ async function getDeterministicDdoFromTxref(txref) {
     if (!txref) {
         throw "Missing txref argument";
     }
-    var txDetails = await txRefConversion.txDetailsFromTxref(txref);
-    var deterministicDid = await toDidDocument(txDetails, txref);
+    var cleanedTxref = util.ensureTxref(txref);
+    var txDetails = await txRefConversion.txDetailsFromTxref(cleanedTxref);
+    var deterministicDid = await toDidDocument(txDetails, cleanedTxref);
     return {
         "txDetails": txDetails,
         "ddo": deterministicDid
@@ -321,22 +321,19 @@ async function getDeterministicDdoFromTxid(txid, chain) {
         throw "Missing chain argument";
     }
     var txDetails = await txRefConversion.txDetailsFromTxid(txid, chain);
-    var deterministicDid = await toDidDocument(txDetails, txDetails.txref);
+    var deterministicDid = await toDidDocument(txDetails, util.ensureTxref(txDetails.txref));
     return {
         "txDetails": txDetails,
         "ddo": deterministicDid
     };
 }
 
-// kim current: 67c0ee676221d9e0e08b98a55a8bf8add9cba854f13dda393e38ffa1b982b833
-// christopher past: f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107
-
-
-getDeterministicDdoFromTxref("txtest1-xkyt-fzgq-qq87-xnhn").then(function (dddo) {
-    console.log(JSON.stringify(dddo, null, 4));
-}, function (error) {
-    console.error(error);
-});
+/*
+getDeterministicDdoFromTxref("did:btcr:txtest1-xkyt-fzgq-qq87-xnhn").then(dddo => {
+  console.log(JSON.stringify(dddo, null, 4));
+}, error => {
+  console.error(error)
+});*/
 
 /*
 getDeterministicDdoFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
@@ -31761,6 +31758,7 @@ var ensureTxref = function ensureTxref(txref) {
     if (txref.startsWith(BTCR_PREFIX)) {
         return txref.substr(BTCR_PREFIX.length + 1);
     }
+    return txref;
 };
 
 async function extractPublicKeyHexFromTxref(txref) {
