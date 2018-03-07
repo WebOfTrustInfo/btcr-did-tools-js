@@ -97,6 +97,12 @@ async function addSupplementalDidDocuments(implicitDdo, txDetails, txref) {
 
 }
 
+async function retrieveDdoFragment(ddoUrl) {
+    let ddo1 = await txRefConversion.promisifiedRequest({"url": ddoUrl});
+    let ddoJson = JSON.parse(ddo1).didDocument;
+    return ddoJson;
+}
+
 
 /**
  * TODO
@@ -152,7 +158,7 @@ function toImplicitDidDocument(txDetails, txref) {
         ddoJson.service = [{
             "type": "BTCREndpoint",
             "serviceEndpoint": ddoUrl,
-            "timestamp": "????"
+            "timestamp": txDetails.timereceived // TODO
         }];
     }
 
@@ -161,24 +167,39 @@ function toImplicitDidDocument(txDetails, txref) {
 
 async function toDidDocument(txDetails, txref) {
     let implicitDdo = toImplicitDidDocument(txDetails, txref);
-    let ddo = await addSupplementalDidDocuments(implicitDdo, txDetails, txref);
-    return ddo;
+    let implicitDdoCopy = JSON.parse(JSON.stringify(implicitDdo));
+
+    let result = {
+        "txDetails": txDetails,
+        "ddophase1": implicitDdo
+    };
+
+    if (implicitDdo.service && implicitDdo.service.length == 1 && implicitDdo.service[0].serviceEndpoint) {
+        let ddoJson = await retrieveDdoFragment(implicitDdo.service[0].serviceEndpoint);
+        result.ddophase2 = ddoJson;
+        let ddo = await addSupplementalDidDocuments(implicitDdoCopy, txDetails, txref);
+        result.ddo = ddo;
+        result.ddophase3 = ddo;
+
+    } else {
+        result.ddo = implicitDdoCopy;
+        result.ddophase3 = implicitDdoCopy;
+    }
+
+    return result;
 }
 
-async function getDeterministicDdoFromTxref(txref) {
+async function resolveFromTxref(txref) {
     if (!txref) {
         throw "Missing txref argument";
     }
     let cleanedTxref = util.ensureTxref(txref);
     let txDetails = await txRefConversion.txDetailsFromTxref(cleanedTxref);
     let deterministicDid = await toDidDocument(txDetails, cleanedTxref);
-    return {
-        "txDetails": txDetails,
-        "ddo": deterministicDid,
-    };
+    return deterministicDid;
 }
 
-async function getDeterministicDdoFromTxid(txid, chain) {
+async function resolveFromTxid(txid, chain) {
     if (!txid) {
         throw "Missing txid argument";
     }
@@ -187,28 +208,25 @@ async function getDeterministicDdoFromTxid(txid, chain) {
     }
     let txDetails = await txRefConversion.txDetailsFromTxid(txid, chain);
     let deterministicDid = await toDidDocument(txDetails, util.ensureTxref(txDetails.txref));
-    return {
-        "txDetails": txDetails,
-        "ddo": deterministicDid,
-    };
+    return deterministicDid;
 }
 
 
-/*
-getDeterministicDdoFromTxref("did:btcr:txtest1-xkyt-fzgq-qq87-xnhn").then(dddo => {
+
+resolveFromTxref("did:btcr:txtest1-xkyt-fzgq-qq87-xnhn").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
-});*/
+});
 
 /*
-getDeterministicDdoFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
+resolveFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
 });*/
 
 module.exports = {
-    getDeterministicDdoFromTxref: getDeterministicDdoFromTxref,
-    getDeterministicDdoFromTxid: getDeterministicDdoFromTxid
+    resolveFromTxref: resolveFromTxref,
+    resolveFromTxid: resolveFromTxid
 };

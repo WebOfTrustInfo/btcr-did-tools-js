@@ -227,6 +227,12 @@ async function addSupplementalDidDocuments(implicitDdo, txDetails, txref) {
     }
 }
 
+async function retrieveDdoFragment(ddoUrl) {
+    var ddo1 = await txRefConversion.promisifiedRequest({ "url": ddoUrl });
+    var ddoJson = JSON.parse(ddo1).didDocument;
+    return ddoJson;
+}
+
 /**
  * TODO
  * - Update remaining satoshi proof elements
@@ -287,7 +293,7 @@ function toImplicitDidDocument(txDetails, txref) {
         ddoJson.service = [{
             "type": "BTCREndpoint",
             "serviceEndpoint": ddoUrl,
-            "timestamp": "????"
+            "timestamp": txDetails.timereceived // TODO
         }];
     }
 
@@ -296,24 +302,38 @@ function toImplicitDidDocument(txDetails, txref) {
 
 async function toDidDocument(txDetails, txref) {
     var implicitDdo = toImplicitDidDocument(txDetails, txref);
-    var ddo = await addSupplementalDidDocuments(implicitDdo, txDetails, txref);
-    return ddo;
+    var implicitDdoCopy = JSON.parse(JSON.stringify(implicitDdo));
+
+    var result = {
+        "txDetails": txDetails,
+        "ddophase1": implicitDdo
+    };
+
+    if (implicitDdo.service && implicitDdo.service.length == 1 && implicitDdo.service[0].serviceEndpoint) {
+        var ddoJson = await retrieveDdoFragment(implicitDdo.service[0].serviceEndpoint);
+        result.ddophase2 = ddoJson;
+        var ddo = await addSupplementalDidDocuments(implicitDdoCopy, txDetails, txref);
+        result.ddo = ddo;
+        result.ddophase3 = ddo;
+    } else {
+        result.ddo = implicitDdoCopy;
+        result.ddophase3 = implicitDdoCopy;
+    }
+
+    return result;
 }
 
-async function getDeterministicDdoFromTxref(txref) {
+async function resolveFromTxref(txref) {
     if (!txref) {
         throw "Missing txref argument";
     }
     var cleanedTxref = util.ensureTxref(txref);
     var txDetails = await txRefConversion.txDetailsFromTxref(cleanedTxref);
     var deterministicDid = await toDidDocument(txDetails, cleanedTxref);
-    return {
-        "txDetails": txDetails,
-        "ddo": deterministicDid
-    };
+    return deterministicDid;
 }
 
-async function getDeterministicDdoFromTxid(txid, chain) {
+async function resolveFromTxid(txid, chain) {
     if (!txid) {
         throw "Missing txid argument";
     }
@@ -322,29 +342,25 @@ async function getDeterministicDdoFromTxid(txid, chain) {
     }
     var txDetails = await txRefConversion.txDetailsFromTxid(txid, chain);
     var deterministicDid = await toDidDocument(txDetails, util.ensureTxref(txDetails.txref));
-    return {
-        "txDetails": txDetails,
-        "ddo": deterministicDid
-    };
+    return deterministicDid;
 }
 
-/*
-getDeterministicDdoFromTxref("did:btcr:txtest1-xkyt-fzgq-qq87-xnhn").then(dddo => {
-  console.log(JSON.stringify(dddo, null, 4));
-}, error => {
-  console.error(error)
-});*/
+resolveFromTxref("did:btcr:txtest1-xkyt-fzgq-qq87-xnhn").then(function (dddo) {
+    console.log(JSON.stringify(dddo, null, 4));
+}, function (error) {
+    console.error(error);
+});
 
 /*
-getDeterministicDdoFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
+resolveFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
 });*/
 
 module.exports = {
-    getDeterministicDdoFromTxref: getDeterministicDdoFromTxref,
-    getDeterministicDdoFromTxid: getDeterministicDdoFromTxid
+    resolveFromTxref: resolveFromTxref,
+    resolveFromTxid: resolveFromTxid
 };
 
 },{"./util":142,"txref-conversion-js":126}],3:[function(require,module,exports){
@@ -352,17 +368,17 @@ module.exports = {
 
 var createBtcrDid = require("./createBtcrDid");
 var signClaim = require("./signClaim");
-var ddoFormatter = require("./ddoFormatter");
+var ddoResolver = require("./ddoResolver");
 
 module.exports = {
   signClaim: signClaim.signClaim,
   createBtcrDid: createBtcrDid.createBtcrDid,
-  getDeterministicDdoFromTxref: ddoFormatter.getDeterministicDdoFromTxref,
-  getDeterministicDdoFromTxid: ddoFormatter.getDeterministicDdoFromTxid
+  resolveFromTxref: ddoResolver.resolveFromTxref,
+  resolveFromTxid: ddoResolver.resolveFromTxid
 
 };
 
-},{"./createBtcrDid":1,"./ddoFormatter":2,"./signClaim":141}],4:[function(require,module,exports){
+},{"./createBtcrDid":1,"./ddoResolver":2,"./signClaim":141}],4:[function(require,module,exports){
 (function (global){
 'use strict';
 

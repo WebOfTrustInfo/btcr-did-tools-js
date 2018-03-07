@@ -1,11 +1,11 @@
 const createBtcrDid = require("./createBtcrDid");
 const signClaim = require("./signClaim");
-const ddoFormatter = require("./ddoFormatter");
+const ddoResolver = require("./ddoResolver");
 
 module.exports = {
   signClaim: signClaim.signClaim,
   createBtcrDid: createBtcrDid.createBtcrDid,
-  getDeterministicDdoFromTxref: ddoFormatter.getDeterministicDdoFromTxref,
-  getDeterministicDdoFromTxid: ddoFormatter.getDeterministicDdoFromTxid
+  resolveFromTxref: ddoResolver.resolveFromTxref,
+  resolveFromTxid: ddoResolver.resolveFromTxid
 
 };
