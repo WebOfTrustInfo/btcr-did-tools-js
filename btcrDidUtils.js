@@ -233,7 +233,7 @@ async function retrieveDdoFragment(ddoUrl) {
     return ddoJson;
 }
 
-/**
+/**r
  * TODO
  * - Update remaining satoshi proof elements
  * @param txDetails
