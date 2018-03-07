@@ -252,7 +252,7 @@ function toImplicitDidDocument(txDetails, txref) {
         "@context": ["https://schema.org/", "https://w3id.org/security/v1"]
     };
 
-    var btcrDidComponent = txref.substring(txref.indexOf('-') + 1); // ?
+    var btcrDidComponent = txref; // txref.substring(txref.indexOf('-') + 1); // ?
     var btcrDid = "did:btcr:" + btcrDidComponent;
     var fundingScript = txDetails.inputs[0].script;
     var publicKeyHex = util.extractPublicKeyHexFromScript(fundingScript).toString();
@@ -28977,6 +28977,7 @@ module.exports = {
   promisifiedRequest: promisifiedRequests.request
 };
 
+
 /*
 txrefToTxid("rk63-uvxf-9pqc-sy")
   .then(result => {
@@ -28989,7 +28990,6 @@ txDetailsFromTxid("2960626c1c538ef120743753d834dd493361177edea2985caf1a678f690e0
  console.log(result);
  });
 */
-
 
 },{"./bech32":124,"./promisifiedRequests":125}],127:[function(require,module,exports){
 var native = require('./native')

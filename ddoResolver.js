@@ -104,7 +104,7 @@ async function retrieveDdoFragment(ddoUrl) {
 }
 
 
-/**
+/**r
  * TODO
  * - Update remaining satoshi proof elements
  * @param txDetails
@@ -123,7 +123,7 @@ function toImplicitDidDocument(txDetails, txref) {
         "@context": ["https://schema.org/", "https://w3id.org/security/v1"]
     };
 
-    let btcrDidComponent = txref.substring(txref.indexOf('-') + 1); // ?
+    let btcrDidComponent = txref; // txref.substring(txref.indexOf('-') + 1); // ?
     let btcrDid = "did:btcr:" + btcrDidComponent;
     let fundingScript = txDetails.inputs[0].script;
     let publicKeyHex = util.extractPublicKeyHexFromScript(fundingScript).toString();
