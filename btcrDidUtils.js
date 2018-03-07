@@ -345,7 +345,7 @@ async function resolveFromTxid(txid, chain) {
     return deterministicDid;
 }
 
-resolveFromTxref("did:btcr:txtest1-xkyt-fzgq-qq87-xnhn").then(function (dddo) {
+resolveFromTxref("xkyt-fzgq-qq87-xnhn").then(function (dddo) {
     console.log(JSON.stringify(dddo, null, 4));
 }, function (error) {
     console.error(error);
@@ -28763,11 +28763,24 @@ var txrefEncode = function (chain, blockHeight, txPos) {
     result.substring(breakIndex + 4, breakIndex + 8) + "-" +
     result.substring(breakIndex + 8, breakIndex + 12) + "-" +
     result.substring(breakIndex + 12, result.length);
-  return finalResult;
+
+  var indexOf = finalResult.indexOf("txtest1");
+  if (indexOf > 0) {
+    let snip = finalResult.indexOf("-", indexOf + 1);
+    return finalResult.substr(snip + 1);
+  }
+  indexOf = finalResult.indexOf("tx1");
+  let snip2 = finalResult.indexOf("-", indexOf + 1);
+  return finalResult.substr(snip2 + 1);
 };
 
 
 var txrefDecode = function (bech32Tx) {
+  if (bech32Tx.startsWith("x")) {
+    bech32Tx = "txtest1-" + bech32Tx;
+  } else {
+    bech32Tx = "tx1-" + bech32Tx;
+  }
   let stripped = bech32Tx.replace(/-/g, '');
 
   let result = bech32.decode(stripped);
@@ -28965,7 +28978,7 @@ module.exports = {
 };
 
 /*
-txrefToTxid("tx1-rk63-uvxf-9pqc-sy")
+txrefToTxid("rk63-uvxf-9pqc-sy")
   .then(result => {
     console.log(result);
   }, error => {
@@ -28974,8 +28987,8 @@ txrefToTxid("tx1-rk63-uvxf-9pqc-sy")
 
 txDetailsFromTxid("2960626c1c538ef120743753d834dd493361177edea2985caf1a678f690e0029", "testnet").then( result => {
  console.log(result);
- });*/
-
+ });
+*/
 
 
 },{"./bech32":124,"./promisifiedRequests":125}],127:[function(require,module,exports){
