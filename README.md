@@ -8,7 +8,7 @@ npm install
 ## Resolve a BTCR DID
 
 ```
-resolveFromTxref("xkyt-fzgq-qq87-xnhn").then(ddo => {
+resolveFromTxref("did:btcr:xkyt-fzgq-qq87-xnhn").then(ddo => {
   console.log(JSON.stringify(ddo, null, 4));
 }, error => {
   console.error(error)
