@@ -1,41 +1,52 @@
-# Create BTCR DID
+## Install
 
-This is a prototype-only script to create BTCR DIDs.
-
-
-## Install 
 ```
 git clone git@github.com:WebOfTrustInfo/btcr-did-tools-js.git
 npm install
 ```
 
-## Preparation
+## Resolve a BTCR DID
+
+```
+resolveFromTxref("xkyt-fzgq-qq87-xnhn").then(ddo => {
+  console.log(JSON.stringify(ddo, null, 4));
+}, error => {
+  console.error(error)
+});
+```
+
+## Create BTCR DID
+
+This is a prototype-only script to create BTCR DIDs.
+
+
+### Preparation
 
 We recommend starting in testnet mode. You will need testnet addresses for the input address and the change address.
 
 If you are new to this, please start with the instructions in "Getting started with Bitcoin and testnet", at the end
 
-## Ensure your private key WIF is available as an environment variable
+### Ensure your private key WIF is available as an environment variable
 
 ```
 export WIF=<privateKeyWif>
 ```
 
-## Create BTCR DID with DDO/1 ref
+### Create BTCR DID with DDO/1 ref
 
 ```
 node createBtcrDidCmd.js -i <inputAddress> -c <changeAddress> -d <link-to-ddo.jsonld>
 
 ```
 
-## Create BTCR DID without DDO/1 ref
+### Create BTCR DID without DDO/1 ref
 
 ```
 node createBtcrDidCmd.js -i <inputAddress> -c <changeAddress>
 
 ```
 
-## Output
+### Output
 
 The output indicates the (to-be-confirmed) txid. You need to wait for confirmations until the txref is known.
 
@@ -52,7 +63,7 @@ transaction details:{
 
 ```
 
-## Usage
+### Usage
 
 The default node is testnet; call `--help` for more options
  
@@ -60,16 +71,18 @@ The default node is testnet; call `--help` for more options
 node createBtcrDid.js --help
 ```
 
+## Utilities
 
-## Get hex-encoded public key from txref
+This library exposes a variety of utilities. Some examples are below
 
+### Get hex-encoded public key from txref
 
 ```
 node utilCmd.js -n <mainnet|testnet> -t <txref>
 
 ```
 
-## Get hex-encoded public key from wif
+### Get hex-encoded public key from wif
 
 Assuming `process.env.WIF` contains the WIF
 
@@ -79,9 +92,9 @@ node utilCmd.js -n <mainnet|testnet>
 ```
 
 
-## Getting started with Bitcoin and testnet
+### Getting started with Bitcoin and testnet
 
-### How to generate testnet addresses
+#### How to generate testnet addresses
 If you don't have a testnet address yet, and don't know how to create one, you can start with this client-side address generator: [https://www.bitaddress.org/?testnet=true](https://www.bitaddress.org/?testnet=true).
 
 As this is a client-side address generator, and will be passing private keys, go ahead and disconnect your internet connection. Even though this is testnet mode, it's a good practice to start following.
@@ -91,7 +104,7 @@ Once you've disconnected from the internet and generated a testnet address, reco
 ![](img/bitaddress.png)
 
 
-### How to get testnet funds
+#### How to get testnet funds
 
 Lastly, you'll need some funds in your input (funding) address before creating the Bitcoin testnet transaction in the following steps.
 
