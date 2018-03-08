@@ -123,8 +123,7 @@ function toImplicitDidDocument(txDetails, txref) {
         "@context": ["https://schema.org/", "https://w3id.org/security/v1"]
     };
 
-    let btcrDidComponent = txref; // txref.substring(txref.indexOf('-') + 1); // ?
-    let btcrDid = "did:btcr:" + btcrDidComponent;
+    let btcrDid = txref;
     let fundingScript = txDetails.inputs[0].script;
     let publicKeyHex = util.extractPublicKeyHexFromScript(fundingScript).toString();
     let ddoUrl = txDetails.outputs.filter((o) => o.dataString).map(e => e.dataString).find(f => f);
@@ -193,9 +192,8 @@ async function resolveFromTxref(txref) {
     if (!txref) {
         throw "Missing txref argument";
     }
-    let cleanedTxref = util.ensureTxref(txref);
-    let txDetails = await txRefConversion.txDetailsFromTxref(cleanedTxref);
-    let deterministicDid = await toDidDocument(txDetails, cleanedTxref);
+    let txDetails = await util.txDetailsFromTxref(txref);
+    let deterministicDid = await toDidDocument(txDetails, txref);
     return deterministicDid;
 }
 
@@ -206,25 +204,26 @@ async function resolveFromTxid(txid, chain) {
     if (!chain) {
         throw "Missing chain argument";
     }
-    let txDetails = await txRefConversion.txDetailsFromTxid(txid, chain);
-    let deterministicDid = await toDidDocument(txDetails, util.ensureTxref(txDetails.txref));
+    let txDetails = await util.txDetailsFromTxid(txid, chain);
+    let deterministicDid = await toDidDocument(txDetails, txDetails.txref);
     return deterministicDid;
 }
 
+// xkyt-fzgq-qq87-xnhn
+// did:btcr:xyv2-xzyq-qqm5-tyke
 
-
-resolveFromTxref("xkyt-fzgq-qq87-xnhn").then(dddo => {
+resolveFromTxref("did:btcr:xyv2-xzyq-qqm5-tyke").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
 });
 
-/*
+
 resolveFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
-});*/
+});
 
 module.exports = {
     resolveFromTxref: resolveFromTxref,

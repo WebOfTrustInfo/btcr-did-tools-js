@@ -19,16 +19,49 @@ const extractPublicKeyHexFromScript = function (script) {
 };
 
 
-const ensureTxref = function (txref) {
-    if (!txref) {
-        throw "Missing txRef";
+const ensureTxref = function (txrefCandidate) {
+    if (!txrefCandidate) {
+        throw "Missing txrefCandidate";
     }
 
-    if (txref.startsWith(BTCR_PREFIX)) {
-        return txref.substr(BTCR_PREFIX.length + 1);
+    var txref = txrefCandidate;
+    if (txrefCandidate.startsWith(BTCR_PREFIX)) {
+        txref = txrefCandidate.substr(BTCR_PREFIX.length + 1);
+    }
+
+    if (!txref.startsWith("txtest") && txref.startsWith("x")) {
+        txref = "txtest1-" + txref;
+    } else if (!txref.startsWith("tx")) {
+        txref = "tx1-" + txref;
     }
     return txref;
 };
+
+const ensureBtcrDid = function (btcrDidCandidate) {
+    if (!btcrDidCandidate) {
+        throw "Missing btcrDidCandidate";
+    }
+
+    var btcrDid = btcrDidCandidate;
+    if (btcrDid.startsWith("txtest1-")) {
+        btcrDid = btcrDid.substr("txtest1-".length);
+    } else if (btcrDid.startsWith("tx1-")) {
+        btcrDid = btcrDid.substr("tx1-".length);
+    }
+
+    if (!btcrDid.startsWith(BTCR_PREFIX)) {
+        return btcrDid = BTCR_PREFIX + btcrDid;
+    }
+
+    return btcrDid;
+};
+
+const btcrDidify = function(txDetails) {
+    let txDetailsCopy = JSON.parse(JSON.stringify(txDetails));
+    txDetailsCopy.txref = ensureBtcrDid(txDetails.txref);
+    return txDetailsCopy;
+}
+
 
 async function extractPublicKeyHexFromTxref(txref) {
     let cleanedTxref = ensureTxref(txref);
@@ -38,6 +71,17 @@ async function extractPublicKeyHexFromTxref(txref) {
     return pub;
 }
 
+
+async function txDetailsFromTxref(txref) {
+    let cleanedTxref = ensureTxref(txref);
+    let txDetails = await txRefConversion.txDetailsFromTxref(cleanedTxref);
+    return btcrDidify(txDetails);
+}
+
+async function txDetailsFromTxid(txid, chain) {
+    let txDetails = await txRefConversion.txDetailsFromTxid(txid);
+    return btcrDidify(txDetails);
+}
 
 const publicKeyHexFromWif = function (wif, network) {
     if (!wif) {
@@ -58,5 +102,7 @@ module.exports = {
     ensureTxref: ensureTxref,
     extractPublicKeyHexFromScript: extractPublicKeyHexFromScript,
     extractPublicKeyHexFromTxref: extractPublicKeyHexFromTxref,
-    publicKeyHexFromWif: publicKeyHexFromWif
+    publicKeyHexFromWif: publicKeyHexFromWif,
+    txDetailsFromTxref: txDetailsFromTxref,
+    txDetailsFromTxid: txDetailsFromTxid
 };

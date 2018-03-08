@@ -252,8 +252,7 @@ function toImplicitDidDocument(txDetails, txref) {
         "@context": ["https://schema.org/", "https://w3id.org/security/v1"]
     };
 
-    var btcrDidComponent = txref; // txref.substring(txref.indexOf('-') + 1); // ?
-    var btcrDid = "did:btcr:" + btcrDidComponent;
+    var btcrDid = txref;
     var fundingScript = txDetails.inputs[0].script;
     var publicKeyHex = util.extractPublicKeyHexFromScript(fundingScript).toString();
     var ddoUrl = txDetails.outputs.filter(function (o) {
@@ -327,9 +326,8 @@ async function resolveFromTxref(txref) {
     if (!txref) {
         throw "Missing txref argument";
     }
-    var cleanedTxref = util.ensureTxref(txref);
-    var txDetails = await txRefConversion.txDetailsFromTxref(cleanedTxref);
-    var deterministicDid = await toDidDocument(txDetails, cleanedTxref);
+    var txDetails = await util.txDetailsFromTxref(txref);
+    var deterministicDid = await toDidDocument(txDetails, txref);
     return deterministicDid;
 }
 
@@ -340,23 +338,25 @@ async function resolveFromTxid(txid, chain) {
     if (!chain) {
         throw "Missing chain argument";
     }
-    var txDetails = await txRefConversion.txDetailsFromTxid(txid, chain);
-    var deterministicDid = await toDidDocument(txDetails, util.ensureTxref(txDetails.txref));
+    var txDetails = await util.txDetailsFromTxid(txid, chain);
+    var deterministicDid = await toDidDocument(txDetails, txDetails.txref);
     return deterministicDid;
 }
 
-resolveFromTxref("xkyt-fzgq-qq87-xnhn").then(function (dddo) {
+// xkyt-fzgq-qq87-xnhn
+// did:btcr:xyv2-xzyq-qqm5-tyke
+
+resolveFromTxref("did:btcr:xyv2-xzyq-qqm5-tyke").then(function (dddo) {
     console.log(JSON.stringify(dddo, null, 4));
 }, function (error) {
     console.error(error);
 });
 
-/*
-resolveFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
-  console.log(JSON.stringify(dddo, null, 4));
-}, error => {
-  console.error(error)
-});*/
+resolveFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(function (dddo) {
+    console.log(JSON.stringify(dddo, null, 4));
+}, function (error) {
+    console.error(error);
+});
 
 module.exports = {
     resolveFromTxref: resolveFromTxref,
@@ -369,16 +369,21 @@ module.exports = {
 var createBtcrDid = require("./createBtcrDid");
 var signClaim = require("./signClaim");
 var ddoResolver = require("./ddoResolver");
+var util = require("./util");
 
 module.exports = {
   signClaim: signClaim.signClaim,
   createBtcrDid: createBtcrDid.createBtcrDid,
+  resolveFromTxid: ddoResolver.resolveFromTxid,
   resolveFromTxref: ddoResolver.resolveFromTxref,
-  resolveFromTxid: ddoResolver.resolveFromTxid
-
+  txDetailsFromTxid: util.txDetailsFromTxid,
+  txDetailsFromTxref: util.txDetailsFromTxref,
+  publicKeyHexFromWif: util.publicKeyHexFromWif,
+  extractPublicKeyHexFromScript: util.extractPublicKeyHexFromScript,
+  extractPublicKeyHexFromTxref: util.extractPublicKeyHexFromTxref
 };
 
-},{"./createBtcrDid":1,"./ddoResolver":2,"./signClaim":141}],4:[function(require,module,exports){
+},{"./createBtcrDid":1,"./ddoResolver":2,"./signClaim":141,"./util":142}],4:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -28763,24 +28768,11 @@ var txrefEncode = function (chain, blockHeight, txPos) {
     result.substring(breakIndex + 4, breakIndex + 8) + "-" +
     result.substring(breakIndex + 8, breakIndex + 12) + "-" +
     result.substring(breakIndex + 12, result.length);
-
-  var indexOf = finalResult.indexOf("txtest1");
-  if (indexOf > 0) {
-    let snip = finalResult.indexOf("-", indexOf + 1);
-    return finalResult.substr(snip + 1);
-  }
-  indexOf = finalResult.indexOf("tx1");
-  let snip2 = finalResult.indexOf("-", indexOf + 1);
-  return finalResult.substr(snip2 + 1);
+  return finalResult;
 };
 
 
 var txrefDecode = function (bech32Tx) {
-  if (bech32Tx.startsWith("x")) {
-    bech32Tx = "txtest1-" + bech32Tx;
-  } else {
-    bech32Tx = "tx1-" + bech32Tx;
-  }
   let stripped = bech32Tx.replace(/-/g, '');
 
   let result = bech32.decode(stripped);
@@ -28977,9 +28969,8 @@ module.exports = {
   promisifiedRequest: promisifiedRequests.request
 };
 
-
 /*
-txrefToTxid("rk63-uvxf-9pqc-sy")
+txrefToTxid("tx1-rk63-uvxf-9pqc-sy")
   .then(result => {
     console.log(result);
   }, error => {
@@ -28988,8 +28979,9 @@ txrefToTxid("rk63-uvxf-9pqc-sy")
 
 txDetailsFromTxid("2960626c1c538ef120743753d834dd493361177edea2985caf1a678f690e0029", "testnet").then( result => {
  console.log(result);
- });
-*/
+ });*/
+
+
 
 },{"./bech32":124,"./promisifiedRequests":125}],127:[function(require,module,exports){
 var native = require('./native')
@@ -31779,15 +31771,47 @@ var extractPublicKeyHexFromScript = function extractPublicKeyHexFromScript(scrip
     return pub;
 };
 
-var ensureTxref = function ensureTxref(txref) {
-    if (!txref) {
-        throw "Missing txRef";
+var ensureTxref = function ensureTxref(txrefCandidate) {
+    if (!txrefCandidate) {
+        throw "Missing txrefCandidate";
     }
 
-    if (txref.startsWith(BTCR_PREFIX)) {
-        return txref.substr(BTCR_PREFIX.length + 1);
+    var txref = txrefCandidate;
+    if (txrefCandidate.startsWith(BTCR_PREFIX)) {
+        txref = txrefCandidate.substr(BTCR_PREFIX.length + 1);
+    }
+
+    if (!txref.startsWith("txtest") && txref.startsWith("x")) {
+        txref = "txtest1-" + txref;
+    } else if (!txref.startsWith("tx")) {
+        txref = "tx1-" + txref;
     }
     return txref;
+};
+
+var ensureBtcrDid = function ensureBtcrDid(btcrDidCandidate) {
+    if (!btcrDidCandidate) {
+        throw "Missing btcrDidCandidate";
+    }
+
+    var btcrDid = btcrDidCandidate;
+    if (btcrDid.startsWith("txtest1-")) {
+        btcrDid = btcrDid.substr("txtest1-".length);
+    } else if (btcrDid.startsWith("tx1-")) {
+        btcrDid = btcrDid.substr("tx1-".length);
+    }
+
+    if (!btcrDid.startsWith(BTCR_PREFIX)) {
+        return btcrDid = BTCR_PREFIX + btcrDid;
+    }
+
+    return btcrDid;
+};
+
+var btcrDidify = function btcrDidify(txDetails) {
+    var txDetailsCopy = JSON.parse(JSON.stringify(txDetails));
+    txDetailsCopy.txref = ensureBtcrDid(txDetails.txref);
+    return txDetailsCopy;
 };
 
 async function extractPublicKeyHexFromTxref(txref) {
@@ -31796,6 +31820,17 @@ async function extractPublicKeyHexFromTxref(txref) {
     var script = txDetails.inputs[0].script;
     var pub = extractPublicKeyHexFromScript(script);
     return pub;
+}
+
+async function txDetailsFromTxref(txref) {
+    var cleanedTxref = ensureTxref(txref);
+    var txDetails = await txRefConversion.txDetailsFromTxref(cleanedTxref);
+    return btcrDidify(txDetails);
+}
+
+async function txDetailsFromTxid(txid, chain) {
+    var txDetails = await txRefConversion.txDetailsFromTxid(txid);
+    return btcrDidify(txDetails);
 }
 
 var publicKeyHexFromWif = function publicKeyHexFromWif(wif, network) {
@@ -31817,7 +31852,9 @@ module.exports = {
     ensureTxref: ensureTxref,
     extractPublicKeyHexFromScript: extractPublicKeyHexFromScript,
     extractPublicKeyHexFromTxref: extractPublicKeyHexFromTxref,
-    publicKeyHexFromWif: publicKeyHexFromWif
+    publicKeyHexFromWif: publicKeyHexFromWif,
+    txDetailsFromTxref: txDetailsFromTxref,
+    txDetailsFromTxid: txDetailsFromTxid
 };
 
 }).call(this,require("buffer").Buffer)

@@ -30,8 +30,6 @@ if (inputAddress === null || changeAddress === null|| wif === null) {
   process.exit(1);
 }
 
-
-
 createBtcrDid.createBtcrDid(inputAddress, changeAddress, chain, wif, ddo1Ref, fee)
     .then(result => console.log("wait for confirmation before using"))
     .catch(err => console.error(err));
