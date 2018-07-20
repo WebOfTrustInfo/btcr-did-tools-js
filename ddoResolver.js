@@ -197,14 +197,14 @@ async function resolveFromTxref(txref) {
     return deterministicDid;
 }
 
-async function resolveFromTxid(txid, chain) {
+async function resolveFromTxid(txid, txOut, chain) {
     if (!txid) {
         throw "Missing txid argument";
     }
     if (!chain) {
         throw "Missing chain argument";
     }
-    let txDetails = await util.txDetailsFromTxid(txid, chain);
+    let txDetails = await util.txDetailsFromTxid(txid, txOut, chain);
     let deterministicDid = await toDidDocument(txDetails, txDetails.txref);
     return deterministicDid;
 }

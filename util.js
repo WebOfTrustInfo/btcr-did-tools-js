@@ -78,8 +78,8 @@ async function txDetailsFromTxref(txref) {
     return btcrDidify(txDetails);
 }
 
-async function txDetailsFromTxid(txid, chain) {
-    let txDetails = await txRefConversion.txDetailsFromTxid(txid);
+async function txDetailsFromTxid(txid, chain, utxoIndex) {
+    let txDetails = await txRefConversion.txDetailsFromTxid(txid, chain, utxoIndex);
     return btcrDidify(txDetails);
 }
 
