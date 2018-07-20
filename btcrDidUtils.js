@@ -280,7 +280,7 @@ function toImplicitDidDocument(txDetails, txref) {
             "chain": txDetails.chain,
             "blockhash": txDetails.blockHash,
             "blockindex": txDetails.blockIndex,
-            "outputindex": 1,
+            "outputindex": txDetails.utxoIndex,
             "blocktime": txDetails.txReceived,
             "time": 1499501000,
             "timereceived": txDetails.txReceived,
