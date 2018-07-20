@@ -212,6 +212,7 @@ async function resolveFromTxid(txid, txOut, chain) {
 // xkyt-fzgq-qq87-xnhn
 // did:btcr:xyv2-xzyq-qqm5-tyke
 
+/*
 resolveFromTxref("did:btcr:xyv2-xzyq-qqm5-tyke").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
@@ -223,7 +224,7 @@ resolveFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c752810
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
-});
+});*/
 
 module.exports = {
     resolveFromTxref: resolveFromTxref,
