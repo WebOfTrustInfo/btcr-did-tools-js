@@ -71,6 +71,16 @@ The default node is testnet; call `--help` for more options
 node createBtcrDid.js --help
 ```
 
+## Browserify this library
+
+Run the following command if you make changes to this library
+
+```
+npm run build
+```
+
+That creates a browserified version, called `btcrDidUtils.js`, which you should copy into the BTCR playground (overwrite the existing one).
+
 ## Utilities
 
 This library exposes a variety of utilities. Some examples are below
