@@ -1,7 +1,7 @@
 ## Install
 
 ```
-git clone git@github.com:WebOfTrustInfo/btcr-did-tools-js.git
+git clone https://github.com/WebOfTrustInfo/btcr-did-tools-js.git
 npm install
 ```
 
