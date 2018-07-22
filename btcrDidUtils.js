@@ -227,10 +227,11 @@ async function addSupplementalDidDocuments(implicitDdo, txDetails, txref) {
     }
 }
 
-async function retrieveDdoFragment(ddoUrl) {
+async function retrieveServiceEndpoint(ddoUrl) {
     var ddo1 = await txRefConversion.promisifiedRequest({ "url": ddoUrl });
     var ddoJson = JSON.parse(ddo1).didDocument;
-    return ddoJson;
+    var vcJson = JSON.parse(ddo1).claims;
+    return [ddoJson, vcJson];
 }
 
 /**r
@@ -309,7 +310,10 @@ async function toDidDocument(txDetails, txref) {
     };
 
     if (implicitDdo.service && implicitDdo.service.length == 1 && implicitDdo.service[0].serviceEndpoint) {
-        var ddoJson = await retrieveDdoFragment(implicitDdo.service[0].serviceEndpoint);
+        var endpointJson = await retrieveServiceEndpoint(implicitDdo.service[0].serviceEndpoint);
+        var ddoJson = endpointJson[0];
+        var vcJson = endpointJson[1];
+        result.vc = vcJson;
         result.ddophase2 = ddoJson;
         var ddo = await addSupplementalDidDocuments(implicitDdoCopy, txDetails, txref);
         result.ddo = ddo;
@@ -3512,21 +3516,35 @@ require('./convert')
 module.exports = BigInteger
 },{"./bigi":11,"./convert":12}],14:[function(require,module,exports){
 module.exports={
-  "_from": "bigi@^1.4.0",
+  "_args": [
+    [
+      "bigi@^1.4.0",
+      "/home/yancy/git/btcr-did-tools-js/node_modules/bitcoinjs-lib"
+    ]
+  ],
+  "_from": "bigi@>=1.4.0 <2.0.0",
   "_id": "bigi@1.4.2",
-  "_inBundle": false,
-  "_integrity": "sha1-nGZalfiLiwj8Bc/XMfVhhZ1yWCU=",
+  "_inCache": true,
+  "_installable": true,
   "_location": "/bigi",
+  "_nodeVersion": "6.1.0",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/bigi-1.4.2.tgz_1469584192413_0.6801238611806184"
+  },
+  "_npmUser": {
+    "email": "jprichardson@gmail.com",
+    "name": "jprichardson"
+  },
+  "_npmVersion": "3.8.6",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
-    "registry": true,
-    "raw": "bigi@^1.4.0",
     "name": "bigi",
-    "escapedName": "bigi",
+    "raw": "bigi@^1.4.0",
     "rawSpec": "^1.4.0",
-    "saveSpec": null,
-    "fetchSpec": "^1.4.0"
+    "scope": null,
+    "spec": ">=1.4.0 <2.0.0",
+    "type": "range"
   },
   "_requiredBy": [
     "/bitcoinjs-lib",
@@ -3534,14 +3552,13 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
+  "_shrinkwrap": null,
   "_spec": "bigi@^1.4.0",
-  "_where": "/Users/kim/projects/btcr-did-tools-js/node_modules/bitcoinjs-lib",
+  "_where": "/home/yancy/git/btcr-did-tools-js/node_modules/bitcoinjs-lib",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {},
-  "deprecated": false,
   "description": "Big integers.",
   "devDependencies": {
     "coveralls": "^2.11.2",
@@ -3550,29 +3567,55 @@ module.exports={
     "mocha": "^2.1.0",
     "mochify": "^2.1.0"
   },
+  "directories": {},
+  "dist": {
+    "shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
+    "tarball": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz"
+  },
+  "gitHead": "c25308081c896ff84702303722bf5ecd8b3f78e3",
   "homepage": "https://github.com/cryptocoinjs/bigi#readme",
   "keywords": [
-    "cryptography",
-    "math",
-    "bitcoin",
     "arbitrary",
-    "precision",
     "arithmetic",
     "big",
-    "integer",
-    "int",
-    "number",
-    "biginteger",
     "bigint",
+    "biginteger",
     "bignumber",
+    "bitcoin",
+    "cryptography",
     "decimal",
-    "float"
+    "float",
+    "int",
+    "integer",
+    "math",
+    "number",
+    "precision"
   ],
   "main": "./lib/index.js",
+  "maintainers": [
+    {
+      "name": "midnightlightning",
+      "email": "boydb@midnightdesign.ws"
+    },
+    {
+      "name": "sidazhang",
+      "email": "sidazhang89@gmail.com"
+    },
+    {
+      "name": "nadav",
+      "email": "npm@shesek.info"
+    },
+    {
+      "name": "jprichardson",
+      "email": "jprichardson@gmail.com"
+    }
+  ],
   "name": "bigi",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
   "repository": {
-    "url": "git+https://github.com/cryptocoinjs/bigi.git",
-    "type": "git"
+    "type": "git",
+    "url": "git+https://github.com/cryptocoinjs/bigi.git"
   },
   "scripts": {
     "browser-test": "mochify --wd -R spec",
@@ -3583,16 +3626,16 @@ module.exports={
     "unit": "mocha"
   },
   "testling": {
-    "files": "test/*.js",
-    "harness": "mocha",
     "browsers": [
-      "ie/9..latest",
-      "firefox/latest",
+      "android-browser/4.2..latest",
       "chrome/latest",
-      "safari/6.0..latest",
+      "firefox/latest",
+      "ie/9..latest",
       "iphone/6.0..latest",
-      "android-browser/4.2..latest"
-    ]
+      "safari/6.0..latest"
+    ],
+    "files": "test/*.js",
+    "harness": "mocha"
   },
   "version": "1.4.2"
 }
