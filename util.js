@@ -4,7 +4,7 @@ const bitcoin = require('bitcoinjs-lib');
 const txRefConversion = require("txref-conversion-js");
 
 
-let BTCR_PREFIX = "did:btcr";
+let BTCR_PREFIX = "did:btcr:";
 let COMPRESSED_PUBLIC_KEY_BYTE_LEN = 33;
 let COMPRESSED_PUBLIC_KEY_HEX_LEN = COMPRESSED_PUBLIC_KEY_BYTE_LEN * 2;
 
@@ -26,7 +26,7 @@ const ensureTxref = function (txrefCandidate) {
 
     var txref = txrefCandidate;
     if (txrefCandidate.startsWith(BTCR_PREFIX)) {
-        txref = txrefCandidate.substr(BTCR_PREFIX.length + 1);
+        txref = txrefCandidate.substr(BTCR_PREFIX.length);
     }
 
     if (!txref.startsWith("txtest") && txref.startsWith("x")) {

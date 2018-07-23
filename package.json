@@ -10,10 +10,10 @@
   "author": "Kim Hamilton Duffy",
   "license": "MIT",
   "dependencies": {
-    "bitcoinjs-lib": "^3.1.0",
+    "bitcoinjs-lib": "^3.3.2",
     "commander": "^2.11.0",
     "jsonld": "^0.4.12",
-    "jsonld-signatures": "^1.2.1",
+    "jsonld-signatures": "^2.3.0",
     "txref-conversion-js": "git+https://github.com/WebOfTrustInfo/txref-conversion-js.git",
     "xmlhttprequest": "^1.8.0"
   },

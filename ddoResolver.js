@@ -201,14 +201,14 @@ async function resolveFromTxref(txref) {
     return deterministicDid;
 }
 
-async function resolveFromTxid(txid, txOut, chain) {
+async function resolveFromTxid(txid, chain, utxoIndex=0) {
     if (!txid) {
         throw "Missing txid argument";
     }
     if (!chain) {
         throw "Missing chain argument";
     }
-    let txDetails = await util.txDetailsFromTxid(txid, txOut, chain);
+    let txDetails = await util.txDetailsFromTxid(txid, chain, utxoIndex);
     let deterministicDid = await toDidDocument(txDetails, txDetails.txref);
     return deterministicDid;
 }
@@ -221,9 +221,9 @@ resolveFromTxref("did:btcr:xyv2-xzyq-qqm5-tyke").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
-});
+});*/
 
-
+/*
 resolveFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {

@@ -127,7 +127,7 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"bitcoinjs-lib":26,"buffer":61,"commander":64,"txref-conversion-js":131}],2:[function(require,module,exports){
+},{"bitcoinjs-lib":26,"buffer":61,"commander":64,"txref-conversion-js":143}],2:[function(require,module,exports){
 'use strict';
 
 var txRefConversion = require("txref-conversion-js");
@@ -335,14 +335,16 @@ async function resolveFromTxref(txref) {
     return deterministicDid;
 }
 
-async function resolveFromTxid(txid, txOut, chain) {
+async function resolveFromTxid(txid, chain) {
+    var utxoIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
     if (!txid) {
         throw "Missing txid argument";
     }
     if (!chain) {
         throw "Missing chain argument";
     }
-    var txDetails = await util.txDetailsFromTxid(txid, txOut, chain);
+    var txDetails = await util.txDetailsFromTxid(txid, chain, utxoIndex);
     var deterministicDid = await toDidDocument(txDetails, txDetails.txref);
     return deterministicDid;
 }
@@ -355,9 +357,9 @@ resolveFromTxref("did:btcr:xyv2-xzyq-qqm5-tyke").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
-});
+});*/
 
-
+/*
 resolveFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
@@ -369,7 +371,7 @@ module.exports = {
     resolveFromTxid: resolveFromTxid
 };
 
-},{"./util":146,"txref-conversion-js":131}],3:[function(require,module,exports){
+},{"./util":158,"txref-conversion-js":143}],3:[function(require,module,exports){
 "use strict";
 
 var createBtcrDid = require("./createBtcrDid");
@@ -389,7 +391,7 @@ module.exports = {
   extractPublicKeyHexFromTxref: util.extractPublicKeyHexFromTxref
 };
 
-},{"./createBtcrDid":1,"./ddoResolver":2,"./signClaim":145,"./util":146}],4:[function(require,module,exports){
+},{"./createBtcrDid":1,"./ddoResolver":2,"./signClaim":157,"./util":158}],4:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -1505,7 +1507,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":6,"_process":91,"inherits":5}],8:[function(require,module,exports){
+},{"./support/isBuffer":6,"_process":103,"inherits":5}],8:[function(require,module,exports){
 // base-x encoding
 // Forked from https://github.com/cryptocoinjs/bs58
 // Originally written by Mike Hearn for BitcoinJ
@@ -1599,7 +1601,7 @@ module.exports = function base (ALPHABET) {
   }
 }
 
-},{"safe-buffer":112}],9:[function(require,module,exports){
+},{"safe-buffer":124}],9:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -3516,35 +3518,21 @@ require('./convert')
 module.exports = BigInteger
 },{"./bigi":11,"./convert":12}],14:[function(require,module,exports){
 module.exports={
-  "_args": [
-    [
-      "bigi@^1.4.0",
-      "/home/yancy/git/btcr-did-tools-js/node_modules/bitcoinjs-lib"
-    ]
-  ],
-  "_from": "bigi@>=1.4.0 <2.0.0",
+  "_from": "bigi@^1.4.0",
   "_id": "bigi@1.4.2",
-  "_inCache": true,
-  "_installable": true,
+  "_inBundle": false,
+  "_integrity": "sha1-nGZalfiLiwj8Bc/XMfVhhZ1yWCU=",
   "_location": "/bigi",
-  "_nodeVersion": "6.1.0",
-  "_npmOperationalInternal": {
-    "host": "packages-12-west.internal.npmjs.com",
-    "tmp": "tmp/bigi-1.4.2.tgz_1469584192413_0.6801238611806184"
-  },
-  "_npmUser": {
-    "email": "jprichardson@gmail.com",
-    "name": "jprichardson"
-  },
-  "_npmVersion": "3.8.6",
   "_phantomChildren": {},
   "_requested": {
-    "name": "bigi",
+    "type": "range",
+    "registry": true,
     "raw": "bigi@^1.4.0",
+    "name": "bigi",
+    "escapedName": "bigi",
     "rawSpec": "^1.4.0",
-    "scope": null,
-    "spec": ">=1.4.0 <2.0.0",
-    "type": "range"
+    "saveSpec": null,
+    "fetchSpec": "^1.4.0"
   },
   "_requiredBy": [
     "/bitcoinjs-lib",
@@ -3552,13 +3540,14 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz",
   "_shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
-  "_shrinkwrap": null,
   "_spec": "bigi@^1.4.0",
-  "_where": "/home/yancy/git/btcr-did-tools-js/node_modules/bitcoinjs-lib",
+  "_where": "/Users/kim/projects/btcr-did-tools-js/node_modules/bitcoinjs-lib",
   "bugs": {
     "url": "https://github.com/cryptocoinjs/bigi/issues"
   },
+  "bundleDependencies": false,
   "dependencies": {},
+  "deprecated": false,
   "description": "Big integers.",
   "devDependencies": {
     "coveralls": "^2.11.2",
@@ -3567,55 +3556,29 @@ module.exports={
     "mocha": "^2.1.0",
     "mochify": "^2.1.0"
   },
-  "directories": {},
-  "dist": {
-    "shasum": "9c665a95f88b8b08fc05cfd731f561859d725825",
-    "tarball": "https://registry.npmjs.org/bigi/-/bigi-1.4.2.tgz"
-  },
-  "gitHead": "c25308081c896ff84702303722bf5ecd8b3f78e3",
   "homepage": "https://github.com/cryptocoinjs/bigi#readme",
   "keywords": [
+    "cryptography",
+    "math",
+    "bitcoin",
     "arbitrary",
+    "precision",
     "arithmetic",
     "big",
-    "bigint",
-    "biginteger",
-    "bignumber",
-    "bitcoin",
-    "cryptography",
-    "decimal",
-    "float",
-    "int",
     "integer",
-    "math",
+    "int",
     "number",
-    "precision"
+    "biginteger",
+    "bigint",
+    "bignumber",
+    "decimal",
+    "float"
   ],
   "main": "./lib/index.js",
-  "maintainers": [
-    {
-      "name": "midnightlightning",
-      "email": "boydb@midnightdesign.ws"
-    },
-    {
-      "name": "sidazhang",
-      "email": "sidazhang89@gmail.com"
-    },
-    {
-      "name": "nadav",
-      "email": "npm@shesek.info"
-    },
-    {
-      "name": "jprichardson",
-      "email": "jprichardson@gmail.com"
-    }
-  ],
   "name": "bigi",
-  "optionalDependencies": {},
-  "readme": "ERROR: No README data found!",
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cryptocoinjs/bigi.git"
+    "url": "git+https://github.com/cryptocoinjs/bigi.git",
+    "type": "git"
   },
   "scripts": {
     "browser-test": "mochify --wd -R spec",
@@ -3626,16 +3589,16 @@ module.exports={
     "unit": "mocha"
   },
   "testling": {
-    "browsers": [
-      "android-browser/4.2..latest",
-      "chrome/latest",
-      "firefox/latest",
-      "ie/9..latest",
-      "iphone/6.0..latest",
-      "safari/6.0..latest"
-    ],
     "files": "test/*.js",
-    "harness": "mocha"
+    "harness": "mocha",
+    "browsers": [
+      "ie/9..latest",
+      "firefox/latest",
+      "chrome/latest",
+      "safari/6.0..latest",
+      "iphone/6.0..latest",
+      "android-browser/4.2..latest"
+    ]
   },
   "version": "1.4.2"
 }
@@ -3755,7 +3718,7 @@ module.exports = {
   encode: encode
 }
 
-},{"safe-buffer":112}],16:[function(require,module,exports){
+},{"safe-buffer":124}],16:[function(require,module,exports){
 module.exports={
   "OP_FALSE": 0,
   "OP_0": 0,
@@ -4000,7 +3963,7 @@ module.exports = {
   toOutputScript: toOutputScript
 }
 
-},{"./networks":27,"./script":28,"./templates":30,"./types":54,"bech32":10,"bs58check":60,"safe-buffer":112,"typeforce":134}],19:[function(require,module,exports){
+},{"./networks":27,"./script":28,"./templates":30,"./types":54,"bech32":10,"bs58check":60,"safe-buffer":124,"typeforce":146}],19:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var bcrypto = require('./crypto')
 var fastMerkleRoot = require('merkle-lib/fastRoot')
@@ -4179,7 +4142,7 @@ Block.prototype.checkProofOfWork = function () {
 
 module.exports = Block
 
-},{"./crypto":21,"./transaction":52,"./types":54,"merkle-lib/fastRoot":88,"safe-buffer":112,"typeforce":134,"varuint-bitcoin":141}],20:[function(require,module,exports){
+},{"./crypto":21,"./transaction":52,"./types":54,"merkle-lib/fastRoot":100,"safe-buffer":124,"typeforce":146,"varuint-bitcoin":153}],20:[function(require,module,exports){
 var pushdata = require('pushdata-bitcoin')
 var varuint = require('varuint-bitcoin')
 
@@ -4237,7 +4200,7 @@ module.exports = {
   writeVarInt: writeVarInt
 }
 
-},{"pushdata-bitcoin":93,"varuint-bitcoin":141}],21:[function(require,module,exports){
+},{"pushdata-bitcoin":105,"varuint-bitcoin":153}],21:[function(require,module,exports){
 var createHash = require('create-hash')
 
 function ripemd160 (buffer) {
@@ -4431,7 +4394,7 @@ module.exports = {
   __curve: secp256k1
 }
 
-},{"./ecsignature":24,"./types":54,"bigi":13,"create-hmac":68,"ecurve":72,"safe-buffer":112,"typeforce":134}],23:[function(require,module,exports){
+},{"./ecsignature":24,"./types":54,"bigi":13,"create-hmac":68,"ecurve":72,"safe-buffer":124,"typeforce":146}],23:[function(require,module,exports){
 var baddress = require('./address')
 var bcrypto = require('./crypto')
 var ecdsa = require('./ecdsa')
@@ -4564,7 +4527,7 @@ ECPair.prototype.verify = function (hash, signature) {
 
 module.exports = ECPair
 
-},{"./address":18,"./crypto":21,"./ecdsa":22,"./networks":27,"./types":54,"bigi":13,"ecurve":72,"randombytes":97,"typeforce":134,"wif":142}],24:[function(require,module,exports){
+},{"./address":18,"./crypto":21,"./ecdsa":22,"./networks":27,"./types":54,"bigi":13,"ecurve":72,"randombytes":109,"typeforce":146,"wif":154}],24:[function(require,module,exports){
 (function (Buffer){
 var bip66 = require('bip66')
 var typeforce = require('typeforce')
@@ -4665,7 +4628,7 @@ ECSignature.prototype.toScriptSignature = function (hashType) {
 module.exports = ECSignature
 
 }).call(this,require("buffer").Buffer)
-},{"./types":54,"bigi":13,"bip66":15,"buffer":61,"typeforce":134}],25:[function(require,module,exports){
+},{"./types":54,"bigi":13,"bip66":15,"buffer":61,"typeforce":146}],25:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var base58check = require('bs58check')
 var bcrypto = require('./crypto')
@@ -4983,7 +4946,7 @@ HDNode.prototype.derivePath = function (path) {
 
 module.exports = HDNode
 
-},{"./crypto":21,"./ecpair":23,"./networks":27,"./types":54,"bigi":13,"bs58check":60,"create-hmac":68,"ecurve":72,"safe-buffer":112,"typeforce":134}],26:[function(require,module,exports){
+},{"./crypto":21,"./ecpair":23,"./networks":27,"./types":54,"bigi":13,"bs58check":60,"create-hmac":68,"ecurve":72,"safe-buffer":124,"typeforce":146}],26:[function(require,module,exports){
 var script = require('./script')
 
 var templates = require('./templates')
@@ -5263,7 +5226,7 @@ module.exports = {
   isDefinedHashType: isDefinedHashType
 }
 
-},{"./script_number":29,"./types":54,"bip66":15,"bitcoin-ops":16,"bitcoin-ops/map":17,"pushdata-bitcoin":93,"safe-buffer":112,"typeforce":134}],29:[function(require,module,exports){
+},{"./script_number":29,"./types":54,"bip66":15,"bitcoin-ops":16,"bitcoin-ops/map":17,"pushdata-bitcoin":105,"safe-buffer":124,"typeforce":146}],29:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 
 function decode (buffer, maxLength, minimal) {
@@ -5333,7 +5296,7 @@ module.exports = {
   encode: encode
 }
 
-},{"safe-buffer":112}],30:[function(require,module,exports){
+},{"safe-buffer":124}],30:[function(require,module,exports){
 var decompile = require('../script').decompile
 var multisig = require('./multisig')
 var nullData = require('./nulldata')
@@ -5489,7 +5452,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":28,"./output":33,"bitcoin-ops":16,"safe-buffer":112,"typeforce":134}],33:[function(require,module,exports){
+},{"../../script":28,"./output":33,"bitcoin-ops":16,"safe-buffer":124,"typeforce":146}],33:[function(require,module,exports){
 // m [pubKeys ...] n OP_CHECKMULTISIG
 
 var bscript = require('../../script')
@@ -5555,7 +5518,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":134}],34:[function(require,module,exports){
+},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":146}],34:[function(require,module,exports){
 // OP_RETURN {data}
 
 var bscript = require('../script')
@@ -5591,7 +5554,7 @@ module.exports = {
   }
 }
 
-},{"../script":28,"../types":54,"bitcoin-ops":16,"typeforce":134}],35:[function(require,module,exports){
+},{"../script":28,"../types":54,"bitcoin-ops":16,"typeforce":146}],35:[function(require,module,exports){
 arguments[4][31][0].apply(exports,arguments)
 },{"./input":36,"./output":37,"dup":31}],36:[function(require,module,exports){
 // {signature}
@@ -5635,7 +5598,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":28,"typeforce":134}],37:[function(require,module,exports){
+},{"../../script":28,"typeforce":146}],37:[function(require,module,exports){
 // {pubKey} OP_CHECKSIG
 
 var bscript = require('../../script')
@@ -5670,7 +5633,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":28,"bitcoin-ops":16,"typeforce":134}],38:[function(require,module,exports){
+},{"../../script":28,"bitcoin-ops":16,"typeforce":146}],38:[function(require,module,exports){
 arguments[4][31][0].apply(exports,arguments)
 },{"./input":39,"./output":40,"dup":31}],39:[function(require,module,exports){
 // {signature} {pubKey}
@@ -5726,7 +5689,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":28,"typeforce":134}],40:[function(require,module,exports){
+},{"../../script":28,"typeforce":146}],40:[function(require,module,exports){
 // OP_DUP OP_HASH160 {pubKeyHash} OP_EQUALVERIFY OP_CHECKSIG
 
 var bscript = require('../../script')
@@ -5770,7 +5733,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":134}],41:[function(require,module,exports){
+},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":146}],41:[function(require,module,exports){
 arguments[4][31][0].apply(exports,arguments)
 },{"./input":42,"./output":43,"dup":31}],42:[function(require,module,exports){
 // <scriptSig> {serialized scriptPubKey script}
@@ -5859,7 +5822,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":28,"../multisig/":31,"../pubkey/":35,"../pubkeyhash/":38,"../witnesspubkeyhash/output":48,"../witnessscripthash/output":51,"safe-buffer":112,"typeforce":134}],43:[function(require,module,exports){
+},{"../../script":28,"../multisig/":31,"../pubkey/":35,"../pubkeyhash/":38,"../witnesspubkeyhash/output":48,"../witnessscripthash/output":51,"safe-buffer":124,"typeforce":146}],43:[function(require,module,exports){
 // OP_HASH160 {scriptHash} OP_EQUAL
 
 var bscript = require('../../script')
@@ -5895,7 +5858,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":134}],44:[function(require,module,exports){
+},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":146}],44:[function(require,module,exports){
 module.exports = {
   output: require('./output')
 }
@@ -5944,7 +5907,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":28,"../../types":54,"bitcoin-ops":16,"safe-buffer":112,"typeforce":134}],46:[function(require,module,exports){
+},{"../../script":28,"../../types":54,"bitcoin-ops":16,"safe-buffer":124,"typeforce":146}],46:[function(require,module,exports){
 arguments[4][31][0].apply(exports,arguments)
 },{"./input":47,"./output":48,"dup":31}],47:[function(require,module,exports){
 // {signature} {pubKey}
@@ -5993,7 +5956,7 @@ module.exports = {
   encodeStack: encodeStack
 }
 
-},{"../../script":28,"typeforce":134}],48:[function(require,module,exports){
+},{"../../script":28,"typeforce":146}],48:[function(require,module,exports){
 // OP_0 {pubKeyHash}
 
 var bscript = require('../../script')
@@ -6028,7 +5991,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":134}],49:[function(require,module,exports){
+},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":146}],49:[function(require,module,exports){
 arguments[4][31][0].apply(exports,arguments)
 },{"./input":50,"./output":51,"dup":31}],50:[function(require,module,exports){
 (function (Buffer){
@@ -6098,7 +6061,7 @@ module.exports = {
 }
 
 }).call(this,{"isBuffer":require("../../../../is-buffer/index.js")})
-},{"../../../../is-buffer/index.js":81,"../../script":28,"../../types":54,"../multisig/":31,"../pubkey/":35,"../pubkeyhash/":38,"typeforce":134}],51:[function(require,module,exports){
+},{"../../../../is-buffer/index.js":81,"../../script":28,"../../types":54,"../multisig/":31,"../pubkey/":35,"../pubkeyhash/":38,"typeforce":146}],51:[function(require,module,exports){
 // OP_0 {scriptHash}
 
 var bscript = require('../../script')
@@ -6133,7 +6096,7 @@ module.exports = {
   encode: encode
 }
 
-},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":134}],52:[function(require,module,exports){
+},{"../../script":28,"../../types":54,"bitcoin-ops":16,"typeforce":146}],52:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var bcrypto = require('./crypto')
 var bscript = require('./script')
@@ -6627,7 +6590,7 @@ Transaction.prototype.setWitness = function (index, witness) {
 
 module.exports = Transaction
 
-},{"./bufferutils":20,"./crypto":21,"./script":28,"./types":54,"bitcoin-ops":16,"safe-buffer":112,"typeforce":134,"varuint-bitcoin":141}],53:[function(require,module,exports){
+},{"./bufferutils":20,"./crypto":21,"./script":28,"./types":54,"bitcoin-ops":16,"safe-buffer":124,"typeforce":146,"varuint-bitcoin":153}],53:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 var baddress = require('./address')
 var bcrypto = require('./crypto')
@@ -7406,7 +7369,7 @@ TransactionBuilder.prototype.__overMaximumFees = function (bytes) {
 
 module.exports = TransactionBuilder
 
-},{"./address":18,"./crypto":21,"./ecpair":23,"./ecsignature":24,"./networks":27,"./script":28,"./templates":30,"./transaction":52,"./types":54,"bitcoin-ops":16,"safe-buffer":112,"typeforce":134}],54:[function(require,module,exports){
+},{"./address":18,"./crypto":21,"./ecpair":23,"./ecsignature":24,"./networks":27,"./script":28,"./templates":30,"./transaction":52,"./types":54,"bitcoin-ops":16,"safe-buffer":124,"typeforce":146}],54:[function(require,module,exports){
 var typeforce = require('typeforce')
 
 var UINT31_MAX = Math.pow(2, 31) - 1
@@ -7461,7 +7424,7 @@ for (var typeName in typeforce) {
 
 module.exports = types
 
-},{"typeforce":134}],55:[function(require,module,exports){
+},{"typeforce":146}],55:[function(require,module,exports){
 
 },{}],56:[function(require,module,exports){
 arguments[4][55][0].apply(exports,arguments)
@@ -7738,7 +7701,7 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":112}],58:[function(require,module,exports){
+},{"safe-buffer":124}],58:[function(require,module,exports){
 var basex = require('base-x')
 var ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
@@ -7796,7 +7759,7 @@ module.exports = function (checksumFn) {
   }
 }
 
-},{"bs58":58,"safe-buffer":112}],60:[function(require,module,exports){
+},{"bs58":58,"safe-buffer":124}],60:[function(require,module,exports){
 'use strict'
 
 var createHash = require('create-hash')
@@ -9715,7 +9678,7 @@ CipherBase.prototype._toString = function (value, enc, fin) {
 
 module.exports = CipherBase
 
-},{"inherits":80,"safe-buffer":112,"stream":121,"string_decoder":57}],64:[function(require,module,exports){
+},{"inherits":80,"safe-buffer":124,"stream":133,"string_decoder":57}],64:[function(require,module,exports){
 (function (process){
 /**
  * Module dependencies.
@@ -10950,7 +10913,7 @@ function exists(file) {
 }
 
 }).call(this,require('_process'))
-},{"_process":91,"child_process":56,"events":76,"fs":56,"path":89,"util":140}],65:[function(require,module,exports){
+},{"_process":103,"child_process":56,"events":76,"fs":56,"path":101,"util":152}],65:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -11093,14 +11056,14 @@ module.exports = function createHash (alg) {
   return new Hash(sha(alg))
 }
 
-},{"cipher-base":63,"inherits":80,"md5.js":87,"ripemd160":111,"sha.js":114}],67:[function(require,module,exports){
+},{"cipher-base":63,"inherits":80,"md5.js":99,"ripemd160":123,"sha.js":126}],67:[function(require,module,exports){
 var MD5 = require('md5.js')
 
 module.exports = function (buffer) {
   return new MD5().update(buffer).digest()
 }
 
-},{"md5.js":87}],68:[function(require,module,exports){
+},{"md5.js":99}],68:[function(require,module,exports){
 'use strict'
 var inherits = require('inherits')
 var Legacy = require('./legacy')
@@ -11164,7 +11127,7 @@ module.exports = function createHmac (alg, key) {
   return new Hmac(alg, key)
 }
 
-},{"./legacy":69,"cipher-base":63,"create-hash/md5":67,"inherits":80,"ripemd160":111,"safe-buffer":112,"sha.js":114}],69:[function(require,module,exports){
+},{"./legacy":69,"cipher-base":63,"create-hash/md5":67,"inherits":80,"ripemd160":123,"safe-buffer":124,"sha.js":126}],69:[function(require,module,exports){
 'use strict'
 var inherits = require('inherits')
 var Buffer = require('safe-buffer').Buffer
@@ -11212,7 +11175,7 @@ Hmac.prototype._final = function () {
 }
 module.exports = Hmac
 
-},{"cipher-base":63,"inherits":80,"safe-buffer":112}],70:[function(require,module,exports){
+},{"cipher-base":63,"inherits":80,"safe-buffer":124}],70:[function(require,module,exports){
 var assert = require('assert')
 var BigInteger = require('bigi')
 
@@ -11639,7 +11602,7 @@ Point.prototype.toString = function () {
 
 module.exports = Point
 
-},{"assert":4,"bigi":13,"safe-buffer":112}],75:[function(require,module,exports){
+},{"assert":4,"bigi":13,"safe-buffer":124}],75:[function(require,module,exports){
 (function (process,global,setImmediate){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -12615,7 +12578,7 @@ module.exports = Point
 
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate)
-},{"_process":91,"timers":127}],76:[function(require,module,exports){
+},{"_process":103,"timers":139}],76:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -13016,7 +12979,7 @@ HashBase.prototype._digest = function () {
 
 module.exports = HashBase
 
-},{"inherits":80,"safe-buffer":112,"stream":121}],78:[function(require,module,exports){
+},{"inherits":80,"safe-buffer":124,"stream":133}],78:[function(require,module,exports){
 var http = require('http')
 var url = require('url')
 
@@ -13049,7 +13012,7 @@ function validateParams (params) {
   return params
 }
 
-},{"http":122,"url":136}],79:[function(require,module,exports){
+},{"http":134,"url":148}],79:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -13168,6 +13131,382 @@ module.exports = Array.isArray || function (arr) {
 };
 
 },{}],83:[function(require,module,exports){
+/*!
+ * Copyright (c) 2017-2018 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
+
+const constants = require('./constants');
+const util = require('./util');
+
+module.exports = class Helper {
+  constructor(injector) {
+    this.injector = injector;
+  }
+
+  /**
+   * Gets a remote public key.
+   *
+   * @param id the ID for the public key.
+   * @param [options] the options to use:
+   *          [keyType] the expected key type (a term as compacted via the
+   *            security-v2 context).
+   *          [documentLoader(url, callback(err, remoteDoc))] the document
+   *            loader.
+   *
+   * @return a Promise that resolves to a framed JSON-LD public key.
+   */
+  async getPublicKey(id, options) {
+    options = options || {};
+
+    // get key
+    const key = await this.getJsonLd(id, options);
+
+    // return framed key
+    return this._frameKey(key, options);
+  }
+
+  /**
+   * Checks to see if the given key is valid and trusted.
+   *
+   * @param key the public key to check.
+   * @param [options] the options to use:
+   *          [proof] the proof node, framed according to the security-v2
+   *            context.
+   *          [publicKeyOwner] the JSON-LD document describing the public key
+   *            owner.
+   *          [checkKeyOwner(owner, key)] a custom method to return whether
+   *            or not the key owner is trusted.
+   *          [documentLoader(url, callback(err, remoteDoc))] the document
+   *            loader.
+   *
+   * @return a Promise that resolves to true if the key is trusted.
+   */
+  async checkKey(key, options) {
+    if(!(key && typeof key === 'object')) {
+      throw new TypeError('"key" must be an object.');
+    }
+
+    options = options || {};
+
+    let {
+      checkKeyOwner = () => true,
+      publicKeyOwner: getPublicKeyOwner = this.getJsonLd.bind(this)
+    } = options;
+
+    if(typeof getPublicKeyOwner !== 'function') {
+      const owner = getPublicKeyOwner;
+      getPublicKeyOwner = ownerId => {
+        if(ownerId !== owner.id) {
+          throw new Error('Public key owner not found.');
+        }
+        return owner;
+      };
+    }
+    checkKeyOwner = util.normalizeAsyncFn(checkKeyOwner, 3);
+    getPublicKeyOwner = util.normalizeAsyncFn(getPublicKeyOwner, 2);
+
+    // get framed key
+    const framedKey = await this._frameKey(key, options);
+
+    // get proof purpose
+    const {proofPurpose = 'publicKey'} = options.proof || {};
+
+    // get framed owners
+    const owners = await getPublicKeyOwner(framedKey.owner, options);
+    const framedOwners = await this._frameKeyOwners(
+      owners, proofPurpose, options);
+
+    // find specific owner of key
+    let owner;
+    const jsonld = this.injector.use('jsonld');
+    for(let i = 0; i < framedOwners.length; ++i) {
+      let keys;
+      // direct access to public keys
+      if(proofPurpose === 'publicKey') {
+        keys = jsonld.getValues(framedOwners[i], proofPurpose);
+      } else {
+        // FIXME: apply known application suite rules and allow for custom
+        //   functions to be passed to handle unknown ones
+
+        // indirect access via application suites
+        keys = jsonld.getValues(framedOwners[i], proofPurpose)
+          .map(appSuite => appSuite.publicKey);
+      }
+
+      if(keys.some(key => typeof key === 'object' ?
+        key.id === framedKey.id : key === framedKey.id)) {
+        owner = framedOwners[i];
+        break;
+      }
+    }
+    if(!owner) {
+      throw new Error('The public key is not owned by its declared owner.');
+    }
+
+    const isOwnerTrusted = checkKeyOwner(owner, key, options);
+    if(!isOwnerTrusted) {
+      throw new Error('The owner of the public key is not trusted.');
+    }
+
+    return true;
+  }
+
+  /**
+   * Retrieves a JSON-LD document over HTTP. To implement caching, override
+   * this method.
+   *
+   * @param url the URL to HTTP GET.
+   * @param [options] the options to use.
+   *          [documentLoader(url, callback(err, remoteDoc))] the document
+   *          loader.
+   *
+   * @return a Promise that resolves to the JSON-LD document.
+   */
+  async getJsonLd(url, options) {
+    options = options || {};
+
+    const jsonld = this.injector.use('jsonld');
+    const remoteDoc = await jsonld.get(url, options);
+
+    // compact w/context URL from link header
+    if(remoteDoc.contextUrl) {
+      const opts = {expandContext: remoteDoc.contextUrl};
+      if(options.documentLoader) {
+        opts.documentLoader = options.documentLoader;
+      }
+      return jsonld.compact(remoteDoc.document, remoteDoc.contextUrl, opts);
+    }
+
+    return remoteDoc.document;
+  }
+
+  async _frameKey(key, options) {
+    // `CryptographicKey` used here for backwards compatibility
+    let requiredKeyType = 'CryptographicKey';
+    if(options.keyType) {
+      requiredKeyType = options.keyType;
+    }
+
+    const frame = {
+      '@context': constants.SECURITY_CONTEXT_URL,
+      type: requiredKeyType,
+      owner: {'@embed': '@never'}
+    };
+    const jsonld = this.injector.use('jsonld');
+    const opts = {};
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
+    }
+    const framed = await jsonld.frame(key, frame, opts);
+
+    // FIXME: improve validation
+    if(!framed['@graph'][0]) {
+      throw new Error(`The public key is not a "${requiredKeyType}".`);
+    }
+    if(!framed['@graph'][0].owner) {
+      throw new Error('The public key has no specified owner.');
+    }
+    framed['@graph'][0]['@context'] = framed['@context'];
+    return framed['@graph'][0];
+  }
+
+  async _frameKeyOwners(owners, proofPurpose, options) {
+    const frame = {
+      '@context': constants.SECURITY_CONTEXT_URL,
+      '@requireAll': false
+    };
+    if(proofPurpose === 'publicKey') {
+      // direct access to public keys
+      frame.publicKey = {'@embed': '@never'};
+    } else {
+      // indirect access to public keys via application suites
+      frame[proofPurpose] = {
+        '@embed': '@always',
+        publicKey: {'@embed': '@never'}
+      };
+    }
+    const jsonld = this.injector.use('jsonld');
+    const opts = {};
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
+    }
+    const framed = await jsonld.frame(owners, frame, opts);
+    return framed['@graph'];
+  }
+
+  async _frameAppSuite(owners, proofPurpose, options) {
+    const frame = {
+      '@context': constants.SECURITY_CONTEXT_URL,
+      '@requireAll': false,
+      [proofPurpose]: {'@embed': '@never'}
+    };
+    const jsonld = this.injector.use('jsonld');
+    const opts = {};
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
+    }
+    const framed = await jsonld.frame(owners, frame, opts);
+    return framed['@graph'];
+  }
+};
+
+},{"./constants":85,"./util":96}],84:[function(require,module,exports){
+(function (process,global){
+/*
+ * Copyright (c) 2017 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
+
+module.exports = class Injector {
+  constructor() {
+    this._libs = {};
+    this.env = {};
+    this.env.nodejs = (typeof process !== 'undefined' &&
+      process.versions && process.versions.node);
+    if(!this.env.nodejs) {
+      this.env.browser = true;
+    }
+  }
+
+  /**
+   * Allows injectables to be set or retrieved.
+   *
+   * @param name the name of the injectable to use (
+   *          eg: `jsonld`, `jsonld-signatures`).
+   * @param [injectable] the api to set for the injectable, only present for
+   *          setter, omit for getter.
+   *
+   * @return the API for `name` if not using this method as a setter, otherwise
+   *           undefined.
+   */
+  use(name, injectable) {
+    // setter mode
+    if(injectable) {
+      this._libs[name] = injectable;
+      return;
+    }
+
+    // getter mode:
+
+    // api not set yet, load default
+    if(!this._libs[name]) {
+      const requireAliases = {
+        'forge': 'node-forge',
+        'bitcoreMessage': 'bitcore-message'
+      };
+      const requireName = requireAliases[name] || name;
+      this._libs[name] = global[name] || (this.env.nodejs &&
+        require(requireName));
+      if(name === 'jsonld' && this.env.nodejs) {
+        // locally configure jsonld
+        this._libs[name] = this._libs[name]();
+        this._libs[name].useDocumentLoader(
+          'node', {secure: true, strictSSL: true});
+      }
+    }
+    return this._libs[name];
+  }
+};
+
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"_process":103}],85:[function(require,module,exports){
+/*
+ * Copyright (c) 2017-2018 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
+
+module.exports = {
+  SECURITY_CONTEXT_URL: 'https://w3id.org/security/v2',
+  SECURITY_CONTEXT_V1_URL: 'https://w3id.org/security/v1',
+  SECURITY_CONTEXT_V2_URL: 'https://w3id.org/security/v2'
+};
+
+},{}],86:[function(require,module,exports){
+/*
+ * Copyright (c) 2017-2018 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
+
+const constants = require('./constants');
+
+module.exports = {
+  [constants.SECURITY_CONTEXT_V1_URL]: require('./contexts/security-v1'),
+  [constants.SECURITY_CONTEXT_V2_URL]: require('./contexts/security-v2')
+};
+
+},{"./constants":85,"./contexts/security-v1":87,"./contexts/security-v2":88}],87:[function(require,module,exports){
+module.exports = {
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+
+    "dc": "http://purl.org/dc/terms/",
+    "sec": "https://w3id.org/security#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+
+    "EcdsaKoblitzSignature2016": "sec:EcdsaKoblitzSignature2016",
+    "Ed25519Signature2018": "sec:Ed25519Signature2018",
+    "EncryptedMessage": "sec:EncryptedMessage",
+    "GraphSignature2012": "sec:GraphSignature2012",
+    "LinkedDataSignature2015": "sec:LinkedDataSignature2015",
+    "LinkedDataSignature2016": "sec:LinkedDataSignature2016",
+    "CryptographicKey": "sec:Key",
+
+    "authenticationTag": "sec:authenticationTag",
+    "canonicalizationAlgorithm": "sec:canonicalizationAlgorithm",
+    "cipherAlgorithm": "sec:cipherAlgorithm",
+    "cipherData": "sec:cipherData",
+    "cipherKey": "sec:cipherKey",
+    "created": {"@id": "dc:created", "@type": "xsd:dateTime"},
+    "creator": {"@id": "dc:creator", "@type": "@id"},
+    "digestAlgorithm": "sec:digestAlgorithm",
+    "digestValue": "sec:digestValue",
+    "domain": "sec:domain",
+    "encryptionKey": "sec:encryptionKey",
+    "expiration": {"@id": "sec:expiration", "@type": "xsd:dateTime"},
+    "expires": {"@id": "sec:expiration", "@type": "xsd:dateTime"},
+    "initializationVector": "sec:initializationVector",
+    "iterationCount": "sec:iterationCount",
+    "nonce": "sec:nonce",
+    "normalizationAlgorithm": "sec:normalizationAlgorithm",
+    "owner": {"@id": "sec:owner", "@type": "@id"},
+    "password": "sec:password",
+    "privateKey": {"@id": "sec:privateKey", "@type": "@id"},
+    "privateKeyPem": "sec:privateKeyPem",
+    "publicKey": {"@id": "sec:publicKey", "@type": "@id"},
+    "publicKeyBase58": "sec:publicKeyBase58",
+    "publicKeyPem": "sec:publicKeyPem",
+    "publicKeyService": {"@id": "sec:publicKeyService", "@type": "@id"},
+    "revoked": {"@id": "sec:revoked", "@type": "xsd:dateTime"},
+    "salt": "sec:salt",
+    "signature": "sec:signature",
+    "signatureAlgorithm": "sec:signingAlgorithm",
+    "signatureValue": "sec:signatureValue"
+  }
+};
+
+},{}],88:[function(require,module,exports){
+module.exports = {
+  "@context": [{
+    "@version": 1.1
+  }, "https://w3id.org/security/v1", {
+    "Ed25519Signature2018": "sec:Ed25519Signature2018",
+    "Ed25519VerificationKey2018": "sec:Ed25519VerificationKey2018",
+    "EquihashProof2018": "sec:EquihashProof2018",
+    "RsaSignature2018": "sec:RsaSignature2018",
+    "RsaVerificationKey2018": "sec:RsaVerificationKey2018",
+
+    "equihashParameterK": {"@id": "sec:equihashParameterK", "@type": "xsd:integer"},
+    "equihashParameterN": {"@id": "sec:equihashParameterN", "@type": "xsd:integer"},
+    "jws": "sec:jws",
+    "proof": {"@id": "sec:proof", "@type": "@id", "@container": "@graph"},
+    "proofPurpose": {"@id": "sec:proofPurpose", "@type": "@vocab"},
+    "proofValue": "sec:proofValue"
+  }]
+};
+
+},{}],89:[function(require,module,exports){
 (function (process){
 /**
  * An implementation of the Linked Data Signatures specification for JSON-LD.
@@ -13178,7 +13517,7 @@ module.exports = Array.isArray || function (arr) {
  * @author Manu Sporny <msporny@digitalbazaar.com>
  *
  * BSD 3-Clause License
- * Copyright (c) 2014-2016 Digital Bazaar, Inc.
+ * Copyright (c) 2014-2018 Digital Bazaar, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -13211,226 +13550,113 @@ module.exports = Array.isArray || function (arr) {
 
 'use strict';
 
+const Injector = require('./Injector');
+const util = require('./util');
+
+// TODO: only require dynamically as needed or according to build
+const suites = {
+  EcdsaKoblitzSignature2016: require('./suites/EcdsaKoblitzSignature2016'),
+  Ed25519Signature2018: require('./suites/Ed25519Signature2018'),
+  LinkedDataSignature: require('./suites/LinkedDataSignature'),
+  LinkedDataSignature2015: require('./suites/LinkedDataSignature2015'),
+  GraphSignature2012: require('./suites/GraphSignature2012'),
+  RsaSignature2018: require('./suites/RsaSignature2018')
+};
+
+// load locally embedded contexts
+const contexts = require('./contexts');
+
 // determine if using node.js or browser
-var _nodejs = (
+const _nodejs = (
   typeof process !== 'undefined' && process.versions && process.versions.node);
-var _browser = !_nodejs &&
+const _browser = !_nodejs &&
   (typeof window !== 'undefined' || typeof self !== 'undefined');
 
 /**
  * Attaches the JSON-LD Signatures API to the given object.
  *
  * @param api the object to attach the signatures API to.
- * @param [options] the options to use:
- *          [inject] *deprecated*, use `use` API instead; the dependencies to
- *              inject, available global defaults will be used otherwise.
- *            [async] async API.
- *            [forge] forge API.
- *            [jsonld] jsonld.js API; all remote documents will be loaded
- *              using jsonld.documentLoader by default, so ensure a secure
- *              document loader is configured.
  */
-function wrap(api, options) {
+function wrap(api) {
 
-options = options || {};
-var libs = {};
+const injector = new Injector();
 
 /* API Constants */
-
-api.SECURITY_CONTEXT_URL = 'https://w3id.org/security/v1';
-api.SUPPORTED_ALGORITHMS = [
-  'EcdsaKoblitzSignature2016',
-  'GraphSignature2012',
-  'LinkedDataSignature2015'
-];
+const constants = require('./constants');
+Object.assign(api, constants);
 
 /* Core API */
-
-/**
- * Allows injectables to be set or retrieved.
- *
- * @param name the name of the injectable to use (
- *          eg: `jsonld`, `jsonld-signatures`).
- * @param [injectable] the api to set for the injectable, only present for setter,
- *          omit for getter.
- *
- * @return the API for `name` if not using this method as a setter, otherwise
- *   undefined.
- */
-api.use = function(name, injectable) {
-  // setter mode
-  if(injectable) {
-    libs[name] = injectable;
-    return;
-  }
-
-  // getter mode:
-
-  // api not set yet, load default
-  if(!libs[name]) {
-    var requireAliases = {
-      'forge': 'node-forge',
-      'bitcoreMessage': 'bitcore-message'
-    };
-    var requireName = requireAliases[name] || name;
-    var globalName = (name === 'jsonld' ? 'jsonldjs' : name);
-    libs[name] = global[globalName] || (_nodejs && require(requireName));
-    if(name === 'jsonld') {
-      if(_nodejs) {
-        // locally configure jsonld
-        libs[name] = libs[name]();
-        libs[name].useDocumentLoader('node', {secure: true, strictSSL: true});
-      }
-    }
-  }
-  return libs[name];
-};
+api.suites = suites;
 
 /**
  * Signs a JSON-LD document using a digital signature.
  *
  * @param input the JSON-LD document to be signed.
  * @param [options] options to use:
- *          privateKeyPem A PEM-encoded private key.
- *          creator the URL to the paired public key.
+ *          algorithm the algorithm to use, eg: 'Ed25519Signature2018',
+ *            'RsaSignature2018'.
+ *          [privateKeyPem] A PEM-encoded private key.
+ *          [privateKeyBase58] A base85-encoded (Bitcoin/IPFS alphabet)
+ *            private key.
+ *          [creator] the URL to the paired public key.
  *          [date] an optional date to override the signature date with.
  *          [domain] an optional domain to include in the signature.
  *          [nonce] an optional nonce to include in the signature.
- *          [algorithm] the algorithm to use, eg: 'GraphSignature2012',
- *            'LinkedDataSignature2015' (default: 'GraphSignature2012').
+ *          [expansionMap] a custom expansion map that is passed
+ *            to the JSON-LD processor; by default a function that will
+ *            throw an error when unmapped properties are detected in the
+ *            input, use `false` to turn this off and allow unmapped
+ *            properties to be dropped or use a custom function.
+ *          [proof] a JSON-LD document with options to use for the `proof`
+ *            node (e.g. `proofPurpose` or any other custom fields can be
+ *            provided here using a context different from security-v2).
+ *          [documentLoader(url, [callback(err, remoteDoc)])] the document
+ *            loader.
  * @param callback(err, signedDocument) called once the operation completes.
+ *
+ * @return a Promise that resolves to the signed document.
  */
-api.sign = function(input, options, callback) {
-  callback = callback || options;
-  if(!callback) {
-    options = {};
-  }
-  var privateKeyPem = options.privateKeyPem;
-  var privateKeyWif = options.privateKeyWif;
-  var creator = options.creator;
-  var date = options.date || new Date();
-  var domain = options.domain || null;
-  var nonce = options.nonce || null;
-  var algorithm = options.algorithm || 'GraphSignature2012';
+api.sign = util.callbackify(async function(input, options) {
+  options = options || {};
 
-  if(api.SUPPORTED_ALGORITHMS.indexOf(algorithm) === -1) {
-    return callback(new Error(
-      '[jsigs.sign] Unsupported algorithm "' + algorithm + '"; ' +
-      'options.algorithm must be one of: ' +
-      JSON.stringify(api.SUPPORTED_ALGORITHMS)));
+  // no default algorithm; it must be specified
+  if(!('algorithm' in options)) {
+    throw new TypeError('"options.algorithm" must be specified.');
   }
 
-  if(algorithm === 'EcdsaKoblitzSignature2016') {
-    if(typeof privateKeyWif !== 'string') {
-      return callback(new TypeError(
-        '[jsig.sign] options.privateKeyWif must be a base 58 formatted string.'));
-    }
-  } else if(typeof privateKeyPem !== 'string') {
-    return callback(new TypeError(
-      '[jsig.sign] options.privateKeyPem must be a PEM formatted string.'));
+  const SUPPORTED_ALGORITHMS = _getSupportedAlgorithms();
+
+  const algorithm = options.algorithm;
+  if(SUPPORTED_ALGORITHMS.indexOf(algorithm) === -1) {
+    throw new Error(
+      'Unsupported algorithm "' + algorithm + '"; ' +
+      '"options.algorithm" must be one of: ' +
+      JSON.stringify(SUPPORTED_ALGORITHMS));
   }
 
-  if(typeof creator !== 'string') {
-    return callback(new TypeError(
-      '[jsig.sign] options.creator must be a URL string.'));
-  }
-  if(domain && typeof domain !== 'string') {
-    return callback(new TypeError(
-      '[jsig.sign] options.domain must be a string.'));
-  }
-  if(nonce && typeof nonce !== 'string') {
-    return callback(new TypeError(
-      '[jsig.sign] options.nonce must be a string.'));
-  }
+  options = _addEmbeddedContextDocumentLoader(options);
 
-  // create W3C-formatted date
-  if(typeof date !== 'string') {
-    date = _w3cDate(date);
-  }
-
-  var jsonld = api.use('jsonld');
-  var async = api.use('async');
-  async.auto({
-    normalize: function(callback) {
-      var normalizeAlgorithm;
-      if(algorithm === 'GraphSignature2012') {
-        normalizeAlgorithm = 'URGNA2012';
-      } else {
-        normalizeAlgorithm = 'URDNA2015';
-      }
-      jsonld.normalize(
-        input, {algorithm: normalizeAlgorithm, format: 'application/nquads'},
-        callback);
-    },
-    sign: ['normalize', function(callback, results) {
-      var normalized = results.normalize;
-      if(normalized.length === 0) {
-        var inputJson = '';
-        try {
-          inputJson = JSON.stringify(input, null, 2);
-        } catch(err) {
-          inputJson = 'JSON stringification error: ' + err;
-        }
-        return callback(new Error('[jsig.sign] ' +
-          'The data to sign is empty. This error may be because a ' +
-          '"@context" was not supplied in the input thereby causing ' +
-          'any terms or prefixes to be undefined. ' +
-          'Input:\n' + inputJson));
-      }
-
-      _createSignature(normalized, {
-        algorithm: algorithm,
-        privateKeyPem: privateKeyPem,
-        privateKeyWif: privateKeyWif,
-        date: date,
-        nonce: nonce,
-        domain: domain
-      }, callback);
-    }],
-    compact: ['sign', function(callback, results) {
-      // create signature info
-      var signature = {
-        '@context': api.SECURITY_CONTEXT_URL,
-        type: algorithm,
-        creator: creator,
-        created: date,
-        signatureValue: results.sign
-      };
-      if(domain !== null) {
-        signature.domain = domain;
-      }
-      if(nonce !== null) {
-        signature.nonce = nonce;
-      }
-      var tmp = {
-        'https://w3id.org/security#signature': signature
-      };
-      var ctx = jsonld.getValues(input, '@context');
-      jsonld.compact(tmp, ctx, function(err, compacted) {
-        callback(err, compacted);
-      });
-    }],
-    addSignature: ['compact', function(callback, results) {
-      var output = _deepClone(input);
-      delete results.compact['@context'];
-      var signatureKey = Object.keys(results.compact)[0];
-      // TODO: support multiple signatures
-      output[signatureKey] = results.compact[signatureKey];
-      callback(null, output);
-    }]
-  }, function(err, results) {
-    callback(err, results.addSignature);
-  });
-};
+  // TODO: won't work with static analysis?
+  // use signature suite
+  //const Suite = require('./suites/' + algorithm);
+  const Suite = suites[algorithm];
+  return new Suite(injector).sign(input, options);
+});
 
 /**
  * Verifies a JSON-LD digitally-signed object.
  *
  * @param obj the JSON-LD object to verify.
  * @param [options] the options to use:
- *          [publicKey] the JSON-LD document providing the public key info.
- *          [publicKeyOwner] the JSON-LD document providing the public key
- *            owner info including the list of valid keys for that owner.
+ *          [publicKey] a JSON-LD document providing the public
+ *            key info or a function ((keyId, options, [(err, publicKey)]) that
+ *            returns a Promise that resolves to such a document (or that
+ *            accepts a node-style callback that will be passed it).
+ *          [publicKeyOwner] a JSON-LD document providing the public key owner
+ *            info including the list of valid keys for that owner or a
+ *            function (owner, options, [(err, ownerDoc)]) that returns a
+ *            Promise that resolves to such a document (or that accepts a
+ *            node-style callback that will be passed it).
  *          [checkNonce(nonce, options, function(err, valid))] a callback to
  *            check if the nonce (null if none) used in the signature is valid.
  *          [checkDomain(domain, options, function(err, valid))] a callback
@@ -13442,660 +13668,181 @@ api.sign = function(input, options, callback) {
  *          [checkTimestamp]: check signature timestamp (default: false).
  *          [maxTimestampDelta]: signature must be created within a window of
  *            this many seconds (default: 15 minutes).
- *          [documentLoader(url, callback(err, remoteDoc))] the document loader.
+ *          [documentLoader(url, [callback(err, remoteDoc)])] the document
+ *            loader.
  *          [id] the ID (full URL) of the node to check the signature of, if
  *            the input contains multiple signed nodes.
- * @param callback(err, verified) called once the operation completes.
+ * @param [callback(err, result)] called once the operation completes.
+ *
+ * @return a Promise that resolves to the verification result.
  */
-api.verify = function(input, options, callback) {
-  if(typeof options === 'function') {
-    callback = options;
-    options = {};
+api.verify = util.callbackify(async function(input, options) {
+  // set default options
+  options = Object.assign({}, options || {});
+
+  // validate options
+  if('checkNonce' in options &&
+    !(options.checkNonce === false ||
+    typeof options.checkNonce === 'function')) {
+    throw new TypeError(
+      '"options.checkNonce" must be `false` or a function.');
   }
-  options = options || {};
-  var jsonld = api.use('jsonld');
+  if('checkDomain' in options &&
+    !(options.checkDomain === false ||
+    typeof options.checkDomain === 'string' ||
+    typeof options.checkDomain === 'function')) {
+    throw new TypeError(
+      '"options.checkDomain" must be `false`, a string, or a function.');
+  }
+  if('checkTimestamp' in options &&
+    !(options.checkTimestamp === false ||
+    typeof options.checkTimestamp === 'function')) {
+    throw new TypeError(
+      '"options.checkTimestamp" must be `false` or a function.');
+  }
+
+  // backwards compatibility, massage `getPublicKey` and `getPublicKeyOwner`
+  // options into `publicKey` and `publicKeyOwner`
+  if('getPublicKey' in options) {
+    options.publicKey = options.getPublicKey;
+  }
+  if('getPublicKeyOwner' in options) {
+    options.publicKeyOwner = options.getPublicKeyOwner;
+  }
+
+  options = _addEmbeddedContextDocumentLoader(options);
 
   // TODO: frame before getting signature, not just compact? considerations:
-  // should the assumption be that the signature is on the top-level object
-  // and thus framing is unnecessary?
+  // 1. named-graph framing support is required to avoid merging data and
+  //    invalidating the signature
+  // 2. JSON-only inputs will fail compaction -- so perhaps this library
+  //    should require the signature to be at the top?
+  /*
+  const frame = {
+    '@context': constants.SECURITY_CONTEXT_URL,
+    proof: {},
+    signature: {
+      type: algorithm,
+      created: {},
+      creator: {},
+      signatureValue: {}
+    }
+  };
+  if(options.id) {
+    frame.id = options.id;
+  }
+  */
+  // compact to get signature types
+  const jsonld = injector.use('jsonld');
+  const opts = {};
+  if(options.documentLoader) {
+    opts.documentLoader = options.documentLoader;
+  }
+  const framed = await jsonld.compact(
+    input, constants.SECURITY_CONTEXT_URL, opts);
 
-  // compact to get signature and types
-  jsonld.compact(input, api.SECURITY_CONTEXT_URL, function(err, compacted) {
-    if(err) {
-      return callback(err);
+  // ensure there is at least one `proof` or `signature`
+  const proofs = jsonld.getValues(framed, 'signature')
+    .map(doc => ({property: 'signature', doc}))
+    .concat(jsonld.getValues(framed, 'proof')
+      .map(doc => ({property: 'proof', doc})));
+  if(proofs.length === 0) {
+    throw new Error('No signature found.');
+  }
+
+  // TODO: this only works for set signatures; add support for chained
+  // signatures
+
+  // create a promise for each signature to be verified
+  const SUPPORTED_ALGORITHMS = _getSupportedAlgorithms();
+  const results = await Promise.all(proofs.map(proof => (async () => {
+    try {
+      const algorithm = jsonld.getValues(proof.doc, 'type')[0] || '';
+      if(SUPPORTED_ALGORITHMS.indexOf(algorithm) === -1) {
+        throw new Error(
+          'Unsupported signature algorithm "' + algorithm +
+          '"; ' + 'supported algorithms are: ' +
+          JSON.stringify(SUPPORTED_ALGORITHMS));
+      }
+
+      // copy the framed object and place a single signature on each copy
+      const f = util.deepClone(framed);
+      f[proof.property] = proof.doc;
+      // TODO: won't work with static analysis?
+      // use signature suite
+      //const Suite = require('./suites/' + algorithm);
+      const Suite = suites[algorithm];
+      const verified = await new Suite(injector).verify(
+        f, Object.assign({}, options, {framed}));
+      return {verified};
+    } catch(e) {
+      return {verified: false, error: e};
     }
-    var signature = jsonld.getValues(compacted, 'signature')[0] || null;
-    if(!signature) {
-      return callback(new Error('[jsigs.verify] No signature found.'));
+  })()));
+
+  // ensure results include public key identifiers
+  results.forEach((result, i) => {
+    if(proofs[i].doc.creator) {
+      result.publicKey = proofs[i].doc.creator;
     }
-    var algorithm = jsonld.getValues(signature, 'type')[0] || '';
-    if(api.SUPPORTED_ALGORITHMS.indexOf(algorithm) === -1) {
-      return callback(new Error(
-        '[jsigs.verify] Unsupported signature algorithm "' + algorithm + '"; ' +
-        'supported algorithms are: ' +
-        JSON.stringify(api.SUPPORTED_ALGORITHMS)));
-    }
-    return _verify(algorithm, input, options, callback);
   });
-};
+
+  return {
+    keyResults: results,
+    verified: results.every(r => r.verified)
+  };
+});
+
+function _getSupportedAlgorithms() {
+  // every suite is supported except the base class
+  return Object.keys(api.suites).filter(s => s !== 'LinkedDataSignature');
+}
+
+function _addEmbeddedContextDocumentLoader(options) {
+  options = Object.assign({}, options);
+  if(!options.documentLoader) {
+    const jsonld = injector.use('jsonld');
+    const documentLoader = jsonld.documentLoader;
+    options.documentLoader = async url => {
+      if(url in contexts) {
+        return {
+          contextUrl: null,
+          documentUrl: url,
+          document: contexts[url]
+        };
+      }
+      return documentLoader(url);
+    };
+  }
+  return options;
+}
 
 /* Helper functions */
+const Helper = require('./Helper');
+const helper = new Helper(injector);
 
-/**
- * Gets a remote public key.
- *
- * @param id the ID for the public key.
- * @param [options] the options to use:
- *          [documentLoader(url, callback(err, remoteDoc))] the document loader.
- * @param callback(err, key) called once the operation completes.
- */
-api.getPublicKey = function(id, options, callback) {
-  if(typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
-  options = options || {};
+// expose for helper functions
+api.getPublicKey = util.callbackify(helper.getPublicKey.bind(helper));
+api.checkKey = util.callbackify(helper.checkKey.bind(helper));
+api.getJsonLd = util.callbackify(helper.getJsonLd.bind(helper));
 
-  api.getJsonLd(id, options, function(err, key) {
-    if(err) {
-      return callback(err);
-    }
+// expose injector API
+api.use = injector.use.bind(injector);
 
-    // FIXME: improve validation
-    if(!('publicKeyPem' in key)) {
-      return callback(new Error('[jsigs.getPublicKey] ' +
-        'Could not get public key. Unknown format.'));
-    }
+// reexpose API as `.promises` for backwards compatability
+api.promises = api;
 
-    callback(null, key);
-  });
-};
-
-/**
- * Checks to see if the given key is trusted.
- *
- * @param key the public key to check.
- * @param [options] the options to use:
- *          [publicKeyOwner] the JSON-LD document describing the public key
- *            owner.
- *          [checkKeyOwner(owner, key)] a custom method to return whether
- *            or not the key owner is trusted.
- *          [documentLoader(url, callback(err, remoteDoc))] the document loader.
- * @param callback(err, trusted) called once the operation completes.
- */
-api.checkKey = function(key, options, callback) {
-  if(!(key && typeof key === 'object')) {
-    throw new TypeError('`key` must be an object.');
-  }
-  if(typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
-  options = options || {};
-  var jsonld = api.use('jsonld');
-  var async = api.use('async');
-  async.auto({
-    getOwner: function(callback) {
-      if(options.publicKeyOwner) {
-        return callback(null, options.publicKeyOwner);
-      }
-      api.getJsonLd(key.owner, options, callback);
-    },
-    frameKey: function(callback) {
-      var frame = {
-        '@context': api.SECURITY_CONTEXT_URL,
-        type: 'CryptographicKey'
-      };
-      jsonld.frame(key, frame, function(err, framed) {
-        if(err) {
-          return callback(err);
-        }
-        if(!framed['@graph'][0]) {
-          return callback(new Error('[jsigs.verify] ' +
-            'The public key is not a CryptographicKey.'));
-        }
-        callback(null, framed['@graph'][0]);
-      });
-    },
-    frameOwner: ['getOwner', function(callback, results) {
-      var frame = {
-        '@context': api.SECURITY_CONTEXT_URL,
-        publicKey: {'@embed': '@never'}
-      };
-      jsonld.frame(results.getOwner, frame, function(err, framed) {
-        if(err) {
-          return callback(err);
-        }
-        callback(null, framed['@graph']);
-      });
-    }],
-    checkOwner: ['frameOwner', 'frameKey', function(callback, results) {
-      // find specific owner of key
-      var owner;
-      var owners = results.frameOwner;
-      var framedKey = results.frameKey;
-      for(var i = 0; i < owners.length; ++i) {
-        if(jsonld.hasValue(owners[i], 'publicKey', framedKey.id)) {
-          owner = owners[i];
-          break;
-        }
-      }
-      if(!owner) {
-        return callback(new Error('[jsigs.verify] ' +
-          'The public key is not owned by its declared owner.'));
-      }
-      if(!options.checkKeyOwner) {
-        return callback();
-      }
-      options.checkKeyOwner(owner, key, options, function(err, trusted) {
-        if(err) {
-          return callback(err);
-        }
-        if(!trusted) {
-          return callback(new Error('[jsigs.verify] ' +
-            'The owner of the public key is not trusted.'));
-        }
-        return callback();
-      });
-    }]
-  }, function(err) {
-    callback(err, !err && true);
-  });
-};
-
-/**
- * Retrieves a JSON-LD object over HTTP. To implement caching, override
- * this method.
- *
- * @param url the URL to HTTP GET.
- * @param [options] the options to use.
- *          [documentLoader(url, callback(err, remoteDoc))] the document loader.
- * @param callback(err, result) called once the operation completes.
- */
-api.getJsonLd = function(url, options, callback) {
-  if(typeof options === 'function') {
-    callback = options;
-    options = {};
-  }
-  options = options || {};
-  var jsonld = api.use('jsonld');
-
-  var documentLoader = options.documentLoader || jsonld.documentLoader;
-  documentLoader(url, function(err, result) {
-    if(err) {
-      return callback(err);
-    }
-    // ensure result is parsed
-    if(typeof result.document === 'string') {
-      try {
-        result.document = JSON.parse(result.document);
-      } catch(e) {
-        return callback(e);
-      }
-    }
-    if(!result.document) {
-      return callback(new Error(
-        '[jsigs.getJsonLd] No JSON-LD found at "' + url + '".'));
-    }
-    // compact w/context URL from link header
-    if(result.contextUrl) {
-      return jsonld.compact(
-        result.document, result.contextUrl, {expandContext: result.contextUrl},
-        callback);
-    }
-    callback(null, result.document);
-  });
-};
-
-// handle dependency injection
-(function() {
-  var inject = options.inject || {};
-  for(var name in inject) {
-    api.use(name, inject[name]);
-  }
-})();
-
-function _verify(algorithm, input, options, callback) {
-  var checkTimestamp = (
-    'checkTimestamp' in options ? options.checkTimestamp : false);
-  var maxTimestampDelta = (
-    'maxTimestampDelta' in options ? options.maxTimestampDelta : (15 * 60));
-  var jsonld = api.use('jsonld');
-  var async = api.use('async');
-  async.auto({
-    // FIXME: add support for multiple signatures
-    //      : for many signers of an object, can just check all sigs
-    //      : for signed sigs, need to recurse?
-    frame: function(callback) {
-      // frame message to retrieve signature
-      // TODO: `frame` also needs to be run for other algorithms once
-      // any named graph issues are sorted out with the framing algorithm
-      if(algorithm === 'GraphSignature2012') {
-        var frame = {
-          '@context': api.SECURITY_CONTEXT_URL,
-          signature: {
-            type: algorithm,
-            created: {},
-            creator: {},
-            signatureValue: {}
-          }
-        };
-        if(options.id) {
-          frame.id = options.id;
-        }
-        jsonld.frame(input, frame, function(err, framed) {
-          if(err) {
-            return callback(err);
-          }
-          var graphs = framed['@graph'];
-          if(graphs.length === 0) {
-            return callback(new Error('[jsigs.verify] ' +
-              'No signed data found in the provided input.'));
-          }
-          if(graphs.length > 1) {
-            return callback(new Error('[jsigs.verify] ' +
-              'More than one signed graph found.'));
-          }
-          var graph = graphs[0];
-          // copy the top level framed data context
-          graph['@context'] = framed['@context'];
-          var signature = graph.signature;
-          if(!signature) {
-            return callback(new Error('[jsigs.verify] ' +
-              'The message is not digitally signed using a known algorithm.'));
-          }
-          callback(null, graph);
-        });
-      } else {
-        // TODO: remove and use `frame` once named graph issues with framing
-        // are sorted out
-        jsonld.compact(input, api.SECURITY_CONTEXT_URL, function(err, framed) {
-          if(err) {
-            return callback(err);
-          }
-          var signatures = jsonld.getValues(framed, 'signature');
-          if(signatures.length > 1) {
-            return callback(new Error('[jsigs.verify] ' +
-              'More than one signed graph found.'));
-          }
-          callback(null, framed);
-        });
-      }
-    },
-    checkNonce: ['frame', function(callback, results) {
-      var signature = results.frame.signature;
-      var cb = function(err, valid) {
-        if(err) {
-          return callback(err);
-        }
-        if(!valid) {
-          return callback(new Error('[jsigs.verify] ' +
-            'The message nonce is invalid.'));
-        }
-        callback();
-      };
-      if(!options.checkNonce) {
-        return cb(
-          null, (signature.nonce === null || signature.nonce === undefined));
-      }
-      options.checkNonce(signature.nonce, options, cb);
-    }],
-    checkDomain: ['frame', function(callback, results) {
-      var signature = results.frame.signature;
-      var cb = function(err, valid) {
-        if(err) {
-          return callback(err);
-        }
-        if(!valid) {
-          return callback(new Error('[jsigs.verify] ' +
-            'The message domain is invalid.'));
-        }
-        callback();
-      };
-      if(!options.checkDomain) {
-        return cb(
-          null, (signature.domain === null || signature.domain === undefined));
-      }
-      options.checkDomain(signature.domain, options, cb);
-    }],
-    checkDate: ['frame', function(callback, results) {
-      if(!checkTimestamp) {
-        return callback();
-      }
-
-      // ensure signature timestamp within a valid range
-      var now = new Date().getTime();
-      var delta = maxTimestampDelta * 1000;
-      try {
-        var signature = results.frame.signature;
-        var created = Date.parse(signature.created);
-        if(created < (now - delta) || created > (now + delta)) {
-          throw new Error('[jsigs.verify] ' +
-            'The message digital signature timestamp is out of range.');
-        }
-      } catch(ex) {
-        return callback(ex);
-      }
-      callback();
-    }],
-    getPublicKey: ['frame', function(callback, results) {
-      if(options.publicKey) {
-        return callback(null, options.publicKey);
-      }
-      var signature = results.frame.signature;
-      api.getPublicKey(signature.creator, options, callback);
-    }],
-    checkKey: ['getPublicKey', function(callback, results) {
-      if('revoked' in results.getPublicKey) {
-        return callback(new Error('[jsigs.verify] ' +
-          'The message was signed with a key that has been revoked.'));
-      }
-      var cb = function(err, trusted) {
-        if(err) {
-          return callback(err);
-        }
-        if(!trusted) {
-          throw new Error('[jsigs.verify] ' +
-            'The message was not signed with a trusted key.');
-        }
-        callback();
-      };
-      if(options.checkKey) {
-        return options.checkKey(results.getPublicKey, options, cb);
-      }
-      api.checkKey(results.getPublicKey, options, cb);
-    }],
-    normalize: ['checkNonce', 'checkDate', 'checkKey',
-      function(callback, results) {
-      // remove signature property from object
-      var result = results.frame;
-      var signature = result.signature;
-      delete result.signature;
-      var normalizeAlgorithm = (algorithm === 'GraphSignature2012' ?
-        'URGNA2012' : 'URDNA2015');
-      jsonld.normalize(
-        result, {algorithm: normalizeAlgorithm, format: 'application/nquads'},
-        function(err, normalized) {
-          if(err) {
-            return callback(err);
-          }
-          callback(null, {data: normalized, signature: signature});
-        }
-      );
-    }],
-    verifySignature: ['normalize', function(callback, results) {
-      var key = results.getPublicKey;
-      var signature = results.normalize.signature;
-      _verifySignature(results.normalize.data, signature.signatureValue, {
-        algorithm: algorithm,
-        publicKeyPem: key.publicKeyPem,
-        publicKeyWif: key.publicKeyWif,
-        nonce: signature.nonce,
-        date: signature.created,
-        domain: signature.domain
-      }, callback);
-    }]
-  }, function(err, results) {
-    callback(err, results.verifySignature);
-  });
-}
-
-/**
- * Implements the node.js/browser-specific code for creating a digital
- * signature.
- *
- * @param input the data to sign.
- * @param options options to use:
- *          algorithm 'GraphSignature2012' or 'LinkedDataSignature2015'.
- *          privateKeyPem A PEM-encoded private key.
- *          [date] an optional date to override the signature date with.
- *          [domain] an optional domain to include in the signature.
- *          [nonce] an optional nonce to include in the signature.
- * @param callback(err, signature) called once the operation completes.
- */
-var _createSignature = function(input, options, callback) {
-  var signature, privateKey;
-
-  if(options.algorithm === 'EcdsaKoblitzSignature2016') {
-    // works same in any environment
-    try {
-      var bitcoreMessage = api.use('bitcoreMessage');
-      var bitcore = bitcoreMessage.Bitcore;
-      privateKey = bitcore.PrivateKey.fromWIF(options.privateKeyWif);
-      var message = bitcoreMessage(_getDataToHash(input, options));
-      signature = message.sign(privateKey);
-    } catch(err) {
-      return callback(err);
-    }
-    return callback(null, signature);
-  }
-
-  if(_nodejs) {
-    // optimize using node libraries
-    try {
-      var crypto = api.use('crypto');
-      var signer = crypto.createSign('RSA-SHA256');
-      signer.update(_getDataToHash(input, options), 'utf8');
-      signature = signer.sign(options.privateKeyPem, 'base64');
-    } catch(err) {
-      return callback(err);
-    }
-    return callback(null, signature);
-  }
-
-  // browser or other environment
-  try {
-    var forge = api.use('forge');
-    privateKey = forge.pki.privateKeyFromPem(options.privateKeyPem);
-    var md = forge.md.sha256.create();
-    md.update(_getDataToHash(input, options), 'utf8');
-    signature = forge.util.encode64(privateKey.sign(md));
-  } catch(err) {
-    return callback(err);
-  }
-  callback(null, signature);
-};
-
-/**
- * Implements the node.js/browser-specific code for creating a digital
- * signature.
- *
- * @param input the data associated with the signature.
- * @param signature the base-64 encoded signature on the data.
- * @param options options to use:
- *          algorithm 'GraphSignature2012' or 'LinkedDataSignature2015'.
- *          publicKeyPem A PEM-encoded public key.
- *          [date] an optional date to override the signature date with.
- *          [domain] an optional domain to include in the signature.
- *          [nonce] an optional nonce to include in the signature.
- * @param callback(err, valid) called once the operation completes.
- */
-var _verifySignature = function(input, signature, options, callback) {
-  var verified;
-
-  if(options.algorithm === 'EcdsaKoblitzSignature2016') {
-    // works same in any environment
-    try {
-      var bitcoreMessage = api.use('bitcoreMessage');
-      var message = bitcoreMessage(_getDataToHash(input, options));
-      verified = message.verify(options.publicKeyWif, signature);
-    } catch (err) {
-      return callback(err);
-    }
-    return callback(null, verified);
-  }
-
-  if(_nodejs) {
-    // optimize using node libraries
-    var crypto = api.use('crypto');
-    var verifier = crypto.createVerify('RSA-SHA256');
-    verifier.update(_getDataToHash(input, options), 'utf8');
-    verified = verifier.verify(options.publicKeyPem, signature, 'base64');
-    return callback(null, verified);
-  }
-
-  // browser or other environment
-  var forge = api.use('forge');
-  var publicKey = forge.pki.publicKeyFromPem(options.publicKeyPem);
-  var md = forge.md.sha256.create();
-  md.update(_getDataToHash(input, options), 'utf8');
-  verified = publicKey.verify(
-    md.digest().bytes(), forge.util.decode64(signature));
-  callback(null, verified);
-};
-
-function _getDataToHash(input, options) {
-  var toHash = '';
-  if(options.algorithm === 'GraphSignature2012') {
-    if(options.nonce !== null && options.nonce !== undefined) {
-      toHash += options.nonce;
-    }
-    toHash += options.date;
-    toHash += input;
-    if(options.domain !== null && options.domain !== undefined) {
-      toHash += '@' + options.domain;
-    }
-  } else {
-    var headers = {
-      'http://purl.org/dc/elements/1.1/created': options.date,
-      'https://w3id.org/security#domain': options.domain,
-      'https://w3id.org/security#nonce': options.nonce
-    };
-    // add headers in lexicographical order
-    var keys = Object.keys(headers).sort();
-    for(var i = 0; i < keys.length; ++i) {
-      var key = keys[i];
-      var value = headers[key];
-      if(value !== null && value !== undefined) {
-        toHash += key + ': ' + value + '\n';
-      }
-    }
-    toHash += input;
-  }
-  return toHash;
-}
-
-/**
- * Clones a value. If the value is an array or an object it will be deep cloned.
- *
- * @param value the value to clone.
- *
- * @return the cloned value.
- */
-function _deepClone(value) {
-  if(value && typeof value === 'object') {
-    var rval;
-    if(Array.isArray(value)) {
-      rval = new Array(value.length);
-      for(var i = 0; i < rval.length; i++) {
-        rval[i] = _deepClone(value[i]);
-      }
-    } else {
-      rval = {};
-      for(var j in value) {
-        rval[j] = _deepClone(value[j]);
-      }
-    }
-    return rval;
-  }
-  return value;
-}
-
-/**
- * Converts the given date into W3C datetime format (eg: 2011-03-09T21:55:41Z).
- *
- * @param date the date to convert.
- *
- * @return the date in W3C datetime format.
- */
-function _w3cDate(date) {
-  if(date === undefined || date === null) {
-    date = new Date();
-  } else if(typeof date === 'number' || typeof date === 'string') {
-    date = new Date(date);
-  }
-
-  return date.getUTCFullYear() + '-' +
-    _zeroFill(date.getUTCMonth() + 1) + '-' +
-    _zeroFill(date.getUTCDate())  + 'T' +
-    _zeroFill(date.getUTCHours()) + ':' +
-    _zeroFill(date.getUTCMinutes()) + ':' +
-    _zeroFill(date.getUTCSeconds()) + 'Z';
-}
-
-function _zeroFill(num) {
-  return (num < 10) ? '0' + num : '' + num;
-}
-
-/* Promises API */
-
-/**
- * Creates a new promises API object.
- *
- * @param [options] the options to use:
- *          [api] an object to attach the API to.
- *          [version] 'jsonld-signatures-1.0' to output a standard Linked Data
- *            Signatures 1.0 promises API, 'jsigs' to output the same with
- *            augmented proprietary methods (default: 'jsigs')
- *
- * @return the promises API object.
- */
-api.promises = function(options) {
-  options = options || {};
-  var slice = Array.prototype.slice;
-  var jsonld = api.use('jsonld');
-  var promisify = jsonld.promisify;
-
-  // handle 'api' option as version, set defaults
-  var papi = options.api || {};
-  var version = options.version || 'jsigs';
-  if(typeof options.api === 'string') {
-    if(!options.version) {
-      version = options.api;
-    }
-    papi = {};
-  }
-
-  papi.sign = function() {
-    if(arguments.length < 2) {
-      throw new TypeError('Could not sign, too few arguments.');
-    }
-    return promisify.apply(null, [api.sign].concat(slice.call(arguments)));
-  };
-
-  papi.verify = function() {
-    if(arguments.length < 2) {
-      throw new TypeError('Could not verify, too few arguments.');
-    }
-    return promisify.apply(null, [api.verify].concat(slice.call(arguments)));
-  };
-
-  try {
-    api.Promise = global.Promise || require('es6-promise').Promise;
-  } catch(e) {
-    var f = function() {
-      throw new Error('Unable to find a Promise implementation.');
-    };
-    for(var method in api) {
-      papi[method] = f;
-    }
-  }
-
-  return papi;
-};
-
-// extend default promises call w/promise API
-try {
-  api.promises({api: api.promises});
-} catch(e) {}
+// expose base64 functions for testing
+api._encodeBase64Url = util.encodeBase64Url;
+api._decodeBase64Url = util.decodeBase64Url;
 
 return api;
 
 } // end wrap
 
 // used to generate a new verifier API instance
-var factory = function(options) {
-  return wrap(function() {return factory();}, options);
+const factory = function() {
+  return wrap(function() {return factory();});
 };
 wrap(factory);
 
@@ -14118,1169 +13865,1131 @@ if(_nodejs) {
 })(typeof window !== 'undefined' ? window : this);
 
 }).call(this,require('_process'))
-},{"_process":91,"es6-promise":84}],84:[function(require,module,exports){
-(function (process,global){
-/*!
- * @overview es6-promise - a tiny implementation of Promises/A+.
- * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
- * @license   Licensed under MIT license
- *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
- * @version   4.0.5
+},{"./Helper":83,"./Injector":84,"./constants":85,"./contexts":86,"./suites/EcdsaKoblitzSignature2016":90,"./suites/Ed25519Signature2018":91,"./suites/GraphSignature2012":92,"./suites/LinkedDataSignature":93,"./suites/LinkedDataSignature2015":94,"./suites/RsaSignature2018":95,"./util":96,"_process":103}],90:[function(require,module,exports){
+/*
+ * Copyright (c) 2017-2018 Digital Bazaar, Inc. All rights reserved.
  */
+'use strict';
 
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
-    (global.ES6Promise = factory());
-}(this, (function () { 'use strict';
+const LinkedDataSignature2015 = require('./LinkedDataSignature2015');
 
-function objectOrFunction(x) {
-  return typeof x === 'function' || typeof x === 'object' && x !== null;
-}
+module.exports = class EcdsaKoblitzSignature2016
+  extends LinkedDataSignature2015 {
+  constructor(injector, algorithm = 'EcdsaKoblitzSignature2016') {
+    super(injector, algorithm);
+  }
 
-function isFunction(x) {
-  return typeof x === 'function';
-}
+  async createSignatureValue(verifyData, options) {
+    if(typeof options.privateKeyWif !== 'string') {
+      throw new TypeError(
+        '"options.privateKeyWif" must be a base 58 formatted string.');
+    }
 
-var _isArray = undefined;
-if (!Array.isArray) {
-  _isArray = function (x) {
-    return Object.prototype.toString.call(x) === '[object Array]';
-  };
-} else {
-  _isArray = Array.isArray;
-}
+    const bitcoreMessage = this.injector.use('bitcoreMessage');
+    const bitcore = bitcoreMessage.Bitcore;
+    const privateKey = bitcore.PrivateKey.fromWIF(options.privateKeyWif);
+    const message = bitcoreMessage(verifyData.data);
+    return message.sign(privateKey);
+  }
 
-var isArray = _isArray;
+  async verifyProofNode(verifyData, proof, options) {
+    const bitcoreMessage = this.injector.use('bitcoreMessage');
+    const message = bitcoreMessage(verifyData.data);
+    return message.verify(
+      options.publicKey.publicKeyWif, proof.signatureValue);
+  }
 
-var len = 0;
-var vertxNext = undefined;
-var customSchedulerFn = undefined;
-
-var asap = function asap(callback, arg) {
-  queue[len] = callback;
-  queue[len + 1] = arg;
-  len += 2;
-  if (len === 2) {
-    // If len is 2, that means that we need to schedule an async flush.
-    // If additional callbacks are queued before the queue is flushed, they
-    // will be processed by this flush that we are scheduling.
-    if (customSchedulerFn) {
-      customSchedulerFn(flush);
-    } else {
-      scheduleFlush();
+  async validateKey(key, options) {
+    if(typeof key.publicKeyWif !== 'string') {
+      throw new TypeError(
+        'Unknown public key encoding. Public key encoding must be ' +
+        '"publicKeyWif".');
+    }
+    const jsonld = this.injector.use('jsonld');
+    if(!jsonld.hasValue(key, 'type', 'CryptographicKey')) {
+      throw new TypeError(
+        'Invalid key type. Key type must be "CryptographicKey".');
     }
   }
 };
 
-function setScheduler(scheduleFn) {
-  customSchedulerFn = scheduleFn;
-}
+},{"./LinkedDataSignature2015":94}],91:[function(require,module,exports){
+(function (Buffer){
+/**
+ * Copyright (c) 2018 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
 
-function setAsap(asapFn) {
-  asap = asapFn;
-}
+const LinkedDataSignature = require('./LinkedDataSignature');
+const util = require('../util');
 
-var browserWindow = typeof window !== 'undefined' ? window : undefined;
-var browserGlobal = browserWindow || {};
-var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && ({}).toString.call(process) === '[object process]';
+module.exports = class Ed25519Signature2018 extends LinkedDataSignature {
+  constructor(injector, algorithm = 'Ed25519Signature2018') {
+    super(injector, algorithm);
+    this.requiredKeyType = 'Ed25519VerificationKey2018';
+  }
 
-// test for web worker but not in IE10
-var isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
+  async createSignatureValue(verifyData, options) {
+    const forge = this.injector.use('forge');
 
-// node
-function useNextTick() {
-  // node version 0.10.x displays a deprecation warning when nextTick is used recursively
-  // see https://github.com/cujojs/when/issues/410 for details
-  return function () {
-    return process.nextTick(flush);
-  };
-}
+    // TODO: should abstract JWS signing bits out for reuse elsewhere
 
-// vertx
-function useVertxTimer() {
-  if (typeof vertxNext !== 'undefined') {
-    return function () {
-      vertxNext(flush);
+    // JWS header
+    const header = {
+      alg: 'EdDSA',
+      b64: false,
+      crit: ['b64']
+    };
+
+    /*
+    +-------+-----------------------------------------------------------+
+    | "b64" | JWS Signing Input Formula                                 |
+    +-------+-----------------------------------------------------------+
+    | true  | ASCII(BASE64URL(UTF8(JWS Protected Header)) || '.' ||     |
+    |       | BASE64URL(JWS Payload))                                   |
+    |       |                                                           |
+    | false | ASCII(BASE64URL(UTF8(JWS Protected Header)) || '.') ||    |
+    |       | JWS Payload                                               |
+    +-------+-----------------------------------------------------------+
+    */
+
+    const encodedHeader = util.encodeBase64Url(
+      JSON.stringify(header), {forge});
+
+    let encodedSignature;
+    if(this.injector.env.nodejs) {
+      // optimize using node libraries
+      const chloride = require('chloride');
+      const bs58 = require('bs58');
+
+      // decode private key
+      const privateKey = bs58.decode(options.privateKeyBase58);
+
+      // build signing input per above comment
+      const tbs = Buffer.concat([
+        new Buffer(encodedHeader + '.', 'utf8'),
+        new Buffer(verifyData.data, verifyData.encoding)]);
+      const buffer = chloride.crypto_sign_detached(tbs, privateKey);
+      encodedSignature = util.encodeBase64Url(
+        buffer.toString('binary'), {forge});
+    } else {
+      // browser or other environment
+      // decode private key
+      const privateKey = forge.util.binary.base58.decode(
+        options.privateKeyBase58);
+      // build signing input per above comment
+      const buffer = new forge.util.ByteBuffer(encodedHeader + '.', 'utf8');
+      buffer.putBuffer(new forge.util.ByteBuffer(
+        verifyData.data, verifyData.encoding));
+      const binaryString = forge.ed25519.sign({
+        message: buffer,
+        privateKey
+      }).toString('binary');
+      encodedSignature = util.encodeBase64Url(binaryString, {forge});
+    }
+
+    // create detached content signature
+    return encodedHeader + '..' + encodedSignature;
+  }
+
+  async verifyProofNode(verifyData, proof, options) {
+    const forge = this.injector.use('forge');
+
+    const {publicKeyBase58} = options.publicKey;
+
+    // add payload into detached content signature
+    const [encodedHeader, payload, encodedSignature] = proof.jws.split('.');
+
+    const header = JSON.parse(util.decodeBase64Url(encodedHeader, {forge}));
+    /*const expectedHeader = {
+      alg: 'EdDSA',
+      b64: false,
+      crit: ['b64']
+    };*/
+    if(!(header && typeof header === 'object')) {
+      throw new Error('Invalid JWS header.');
+    }
+
+    // confirm header matches all expectations
+    if(!(header.alg === 'EdDSA' && header.b64 === false &&
+      Array.isArray(header.crit) && header.crit.length === 1 &&
+      header.crit[0] === 'b64') && Object.keys(header).length === 3) {
+      throw new Error(
+        'Invalid JWS header parameters for Ed25519Signature2018.');
+    }
+
+    const rawSignature = util.decodeBase64Url(encodedSignature, {forge});
+
+    if(this.injector.env.nodejs) {
+      // optimize using node libraries
+      const chloride = require('chloride');
+      const bs58 = require('bs58');
+
+      // decode public key
+      const publicKey = bs58.decode(publicKeyBase58);
+
+      // rebuild signing input per JWS spec
+      const tbs = Buffer.concat([
+        new Buffer(encodedHeader + '.', 'utf8'),
+        new Buffer(verifyData.data, verifyData.encoding)]);
+      return chloride.crypto_sign_verify_detached(
+        new Buffer(rawSignature, 'binary'), tbs, publicKey);
+    }
+
+    // browser or other environment
+    const publicKey = forge.util.binary.base58.decode(publicKeyBase58);
+    // rebuild signing input per JWS spec
+    const buffer = new forge.util.ByteBuffer(encodedHeader + '.', 'utf8');
+    buffer.putBuffer(new forge.util.ByteBuffer(
+      verifyData.data, verifyData.encoding));
+    return forge.ed25519.verify({
+      message: buffer,
+      signature: rawSignature,
+      publicKey
+    });
+  }
+
+  async validateKey(key, options) {
+    if(typeof key.publicKeyBase58 !== 'string') {
+      throw new TypeError(
+        'Unknown public key encoding. Public key encoding must be ' +
+        '"publicKeyBase58".');
+    }
+    const jsonld = this.injector.use('jsonld');
+    if(!jsonld.hasValue(key, 'type', this.requiredKeyType)) {
+      throw new TypeError(
+        `Invalid key type. Key type must be "${this.requiredKeyType}".`);
+    }
+  }
+};
+
+}).call(this,require("buffer").Buffer)
+},{"../util":96,"./LinkedDataSignature":93,"bs58":55,"buffer":61,"chloride":55}],92:[function(require,module,exports){
+/*
+ * Copyright (c) 2017-2018 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
+
+const constants = require('../constants');
+const LinkedDataSignature2015 = require('./LinkedDataSignature2015');
+
+module.exports = class GraphSignature2012 extends LinkedDataSignature2015 {
+  constructor(injector, algorithm = 'GraphSignature2012') {
+    super(injector, algorithm);
+  }
+
+  async canonize(input, options) {
+    const jsonld = this.injector.use('jsonld');
+    const opts = {
+      algorithm: 'URGNA2012',
+      format: 'application/n-quads',
+      expansionMap: options.expansionMap
+    };
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
+    }
+    return jsonld.canonize(input, opts);
+  }
+
+  async createVerifyData(input, options) {
+    // TODO: frame before getting signature, not just compact? considerations:
+    // should the assumption be (for this library) that the signature is on
+    // the top-level object and thus framing is unnecessary?
+
+    const jsonld = this.injector.use('jsonld');
+    const opts = {expansionMap: options.expansionMap};
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
+    }
+    const compacted = await jsonld.compact(
+      input, constants.SECURITY_CONTEXT_URL, opts);
+
+    // TODO: will need to preserve `signature` when chained signature
+    // option is set in the future
+
+    // delete the existing signature(s) prior to canonicalization
+    delete compacted.signature;
+
+    const c14n = await this.canonize(compacted, options);
+
+    let verifyData = '';
+    if(options.nonce !== null && options.nonce !== undefined) {
+      verifyData += options.nonce;
+    }
+    verifyData += options.date;
+    verifyData += c14n;
+    if(options.domain !== null && options.domain !== undefined) {
+      verifyData += '@' + options.domain;
+    }
+    return {
+      data: verifyData,
+      encoding: 'utf8'
     };
   }
 
-  return useSetTimeout();
-}
-
-function useMutationObserver() {
-  var iterations = 0;
-  var observer = new BrowserMutationObserver(flush);
-  var node = document.createTextNode('');
-  observer.observe(node, { characterData: true });
-
-  return function () {
-    node.data = iterations = ++iterations % 2;
-  };
-}
-
-// web worker
-function useMessageChannel() {
-  var channel = new MessageChannel();
-  channel.port1.onmessage = flush;
-  return function () {
-    return channel.port2.postMessage(0);
-  };
-}
-
-function useSetTimeout() {
-  // Store setTimeout reference so es6-promise will be unaffected by
-  // other code modifying setTimeout (like sinon.useFakeTimers())
-  var globalSetTimeout = setTimeout;
-  return function () {
-    return globalSetTimeout(flush, 1);
-  };
-}
-
-var queue = new Array(1000);
-function flush() {
-  for (var i = 0; i < len; i += 2) {
-    var callback = queue[i];
-    var arg = queue[i + 1];
-
-    callback(arg);
-
-    queue[i] = undefined;
-    queue[i + 1] = undefined;
-  }
-
-  len = 0;
-}
-
-function attemptVertx() {
-  try {
-    var r = require;
-    var vertx = r('vertx');
-    vertxNext = vertx.runOnLoop || vertx.runOnContext;
-    return useVertxTimer();
-  } catch (e) {
-    return useSetTimeout();
-  }
-}
-
-var scheduleFlush = undefined;
-// Decide what async method to use to triggering processing of queued callbacks:
-if (isNode) {
-  scheduleFlush = useNextTick();
-} else if (BrowserMutationObserver) {
-  scheduleFlush = useMutationObserver();
-} else if (isWorker) {
-  scheduleFlush = useMessageChannel();
-} else if (browserWindow === undefined && typeof require === 'function') {
-  scheduleFlush = attemptVertx();
-} else {
-  scheduleFlush = useSetTimeout();
-}
-
-function then(onFulfillment, onRejection) {
-  var _arguments = arguments;
-
-  var parent = this;
-
-  var child = new this.constructor(noop);
-
-  if (child[PROMISE_ID] === undefined) {
-    makePromise(child);
-  }
-
-  var _state = parent._state;
-
-  if (_state) {
-    (function () {
-      var callback = _arguments[_state - 1];
-      asap(function () {
-        return invokeCallback(_state, child, callback, parent._result);
-      });
-    })();
-  } else {
-    subscribe(parent, child, onFulfillment, onRejection);
-  }
-
-  return child;
-}
-
-/**
-  `Promise.resolve` returns a promise that will become resolved with the
-  passed `value`. It is shorthand for the following:
-
-  ```javascript
-  let promise = new Promise(function(resolve, reject){
-    resolve(1);
-  });
-
-  promise.then(function(value){
-    // value === 1
-  });
-  ```
-
-  Instead of writing the above, your code now simply becomes the following:
-
-  ```javascript
-  let promise = Promise.resolve(1);
-
-  promise.then(function(value){
-    // value === 1
-  });
-  ```
-
-  @method resolve
-  @static
-  @param {Any} value value that the returned promise will be resolved with
-  Useful for tooling.
-  @return {Promise} a promise that will become fulfilled with the given
-  `value`
-*/
-function resolve(object) {
-  /*jshint validthis:true */
-  var Constructor = this;
-
-  if (object && typeof object === 'object' && object.constructor === Constructor) {
-    return object;
-  }
-
-  var promise = new Constructor(noop);
-  _resolve(promise, object);
-  return promise;
-}
-
-var PROMISE_ID = Math.random().toString(36).substring(16);
-
-function noop() {}
-
-var PENDING = void 0;
-var FULFILLED = 1;
-var REJECTED = 2;
-
-var GET_THEN_ERROR = new ErrorObject();
-
-function selfFulfillment() {
-  return new TypeError("You cannot resolve a promise with itself");
-}
-
-function cannotReturnOwn() {
-  return new TypeError('A promises callback cannot return that same promise.');
-}
-
-function getThen(promise) {
-  try {
-    return promise.then;
-  } catch (error) {
-    GET_THEN_ERROR.error = error;
-    return GET_THEN_ERROR;
-  }
-}
-
-function tryThen(then, value, fulfillmentHandler, rejectionHandler) {
-  try {
-    then.call(value, fulfillmentHandler, rejectionHandler);
-  } catch (e) {
-    return e;
-  }
-}
-
-function handleForeignThenable(promise, thenable, then) {
-  asap(function (promise) {
-    var sealed = false;
-    var error = tryThen(then, thenable, function (value) {
-      if (sealed) {
-        return;
-      }
-      sealed = true;
-      if (thenable !== value) {
-        _resolve(promise, value);
-      } else {
-        fulfill(promise, value);
-      }
-    }, function (reason) {
-      if (sealed) {
-        return;
-      }
-      sealed = true;
-
-      _reject(promise, reason);
-    }, 'Settle: ' + (promise._label || ' unknown promise'));
-
-    if (!sealed && error) {
-      sealed = true;
-      _reject(promise, error);
+  async validateKey(key, options) {
+    if(typeof key.publicKeyPem !== 'string') {
+      throw new TypeError(
+        'Unknown public key encoding. Public key encoding must be ' +
+        '"publicKeyPem".');
     }
-  }, promise);
-}
-
-function handleOwnThenable(promise, thenable) {
-  if (thenable._state === FULFILLED) {
-    fulfill(promise, thenable._result);
-  } else if (thenable._state === REJECTED) {
-    _reject(promise, thenable._result);
-  } else {
-    subscribe(thenable, undefined, function (value) {
-      return _resolve(promise, value);
-    }, function (reason) {
-      return _reject(promise, reason);
-    });
-  }
-}
-
-function handleMaybeThenable(promise, maybeThenable, then$$) {
-  if (maybeThenable.constructor === promise.constructor && then$$ === then && maybeThenable.constructor.resolve === resolve) {
-    handleOwnThenable(promise, maybeThenable);
-  } else {
-    if (then$$ === GET_THEN_ERROR) {
-      _reject(promise, GET_THEN_ERROR.error);
-    } else if (then$$ === undefined) {
-      fulfill(promise, maybeThenable);
-    } else if (isFunction(then$$)) {
-      handleForeignThenable(promise, maybeThenable, then$$);
-    } else {
-      fulfill(promise, maybeThenable);
+    const jsonld = this.injector.use('jsonld');
+    if(!jsonld.hasValue(key, 'type', 'CryptographicKey')) {
+      throw new TypeError(
+        'Invalid key type. Key type must be "CryptographicKey".');
     }
-  }
-}
-
-function _resolve(promise, value) {
-  if (promise === value) {
-    _reject(promise, selfFulfillment());
-  } else if (objectOrFunction(value)) {
-    handleMaybeThenable(promise, value, getThen(value));
-  } else {
-    fulfill(promise, value);
-  }
-}
-
-function publishRejection(promise) {
-  if (promise._onerror) {
-    promise._onerror(promise._result);
-  }
-
-  publish(promise);
-}
-
-function fulfill(promise, value) {
-  if (promise._state !== PENDING) {
-    return;
-  }
-
-  promise._result = value;
-  promise._state = FULFILLED;
-
-  if (promise._subscribers.length !== 0) {
-    asap(publish, promise);
-  }
-}
-
-function _reject(promise, reason) {
-  if (promise._state !== PENDING) {
-    return;
-  }
-  promise._state = REJECTED;
-  promise._result = reason;
-
-  asap(publishRejection, promise);
-}
-
-function subscribe(parent, child, onFulfillment, onRejection) {
-  var _subscribers = parent._subscribers;
-  var length = _subscribers.length;
-
-  parent._onerror = null;
-
-  _subscribers[length] = child;
-  _subscribers[length + FULFILLED] = onFulfillment;
-  _subscribers[length + REJECTED] = onRejection;
-
-  if (length === 0 && parent._state) {
-    asap(publish, parent);
-  }
-}
-
-function publish(promise) {
-  var subscribers = promise._subscribers;
-  var settled = promise._state;
-
-  if (subscribers.length === 0) {
-    return;
-  }
-
-  var child = undefined,
-      callback = undefined,
-      detail = promise._result;
-
-  for (var i = 0; i < subscribers.length; i += 3) {
-    child = subscribers[i];
-    callback = subscribers[i + settled];
-
-    if (child) {
-      invokeCallback(settled, child, callback, detail);
-    } else {
-      callback(detail);
-    }
-  }
-
-  promise._subscribers.length = 0;
-}
-
-function ErrorObject() {
-  this.error = null;
-}
-
-var TRY_CATCH_ERROR = new ErrorObject();
-
-function tryCatch(callback, detail) {
-  try {
-    return callback(detail);
-  } catch (e) {
-    TRY_CATCH_ERROR.error = e;
-    return TRY_CATCH_ERROR;
-  }
-}
-
-function invokeCallback(settled, promise, callback, detail) {
-  var hasCallback = isFunction(callback),
-      value = undefined,
-      error = undefined,
-      succeeded = undefined,
-      failed = undefined;
-
-  if (hasCallback) {
-    value = tryCatch(callback, detail);
-
-    if (value === TRY_CATCH_ERROR) {
-      failed = true;
-      error = value.error;
-      value = null;
-    } else {
-      succeeded = true;
-    }
-
-    if (promise === value) {
-      _reject(promise, cannotReturnOwn());
-      return;
-    }
-  } else {
-    value = detail;
-    succeeded = true;
-  }
-
-  if (promise._state !== PENDING) {
-    // noop
-  } else if (hasCallback && succeeded) {
-      _resolve(promise, value);
-    } else if (failed) {
-      _reject(promise, error);
-    } else if (settled === FULFILLED) {
-      fulfill(promise, value);
-    } else if (settled === REJECTED) {
-      _reject(promise, value);
-    }
-}
-
-function initializePromise(promise, resolver) {
-  try {
-    resolver(function resolvePromise(value) {
-      _resolve(promise, value);
-    }, function rejectPromise(reason) {
-      _reject(promise, reason);
-    });
-  } catch (e) {
-    _reject(promise, e);
-  }
-}
-
-var id = 0;
-function nextId() {
-  return id++;
-}
-
-function makePromise(promise) {
-  promise[PROMISE_ID] = id++;
-  promise._state = undefined;
-  promise._result = undefined;
-  promise._subscribers = [];
-}
-
-function Enumerator(Constructor, input) {
-  this._instanceConstructor = Constructor;
-  this.promise = new Constructor(noop);
-
-  if (!this.promise[PROMISE_ID]) {
-    makePromise(this.promise);
-  }
-
-  if (isArray(input)) {
-    this._input = input;
-    this.length = input.length;
-    this._remaining = input.length;
-
-    this._result = new Array(this.length);
-
-    if (this.length === 0) {
-      fulfill(this.promise, this._result);
-    } else {
-      this.length = this.length || 0;
-      this._enumerate();
-      if (this._remaining === 0) {
-        fulfill(this.promise, this._result);
-      }
-    }
-  } else {
-    _reject(this.promise, validationError());
-  }
-}
-
-function validationError() {
-  return new Error('Array Methods must be provided an Array');
-};
-
-Enumerator.prototype._enumerate = function () {
-  var length = this.length;
-  var _input = this._input;
-
-  for (var i = 0; this._state === PENDING && i < length; i++) {
-    this._eachEntry(_input[i], i);
   }
 };
 
-Enumerator.prototype._eachEntry = function (entry, i) {
-  var c = this._instanceConstructor;
-  var resolve$$ = c.resolve;
+},{"../constants":85,"./LinkedDataSignature2015":94}],93:[function(require,module,exports){
+/*
+ * Copyright (c) 2017-2018 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
 
-  if (resolve$$ === resolve) {
-    var _then = getThen(entry);
+const constants = require('../constants');
+const util = require('../util');
+const Helper = require('../Helper');
 
-    if (_then === then && entry._state !== PENDING) {
-      this._settledAt(entry._state, i, entry._result);
-    } else if (typeof _then !== 'function') {
-      this._remaining--;
-      this._result[i] = entry;
-    } else if (c === Promise) {
-      var promise = new c(noop);
-      handleMaybeThenable(promise, entry, _then);
-      this._willSettleAt(promise, i);
-    } else {
-      this._willSettleAt(new c(function (resolve$$) {
-        return resolve$$(entry);
-      }), i);
+// TODO: reorganize this class further and make it more obvious which
+// methods need to be extended in proof plugins
+
+// TODO: make signature and verification code (and potentially other code)
+// more DRY, especially wrt. plugins having reimplement functionality
+
+module.exports = class LinkedDataSignature {
+  constructor(injector, algorithm) {
+    this.injector = injector;
+    this.algorithm = algorithm;
+    this.helper = new Helper(injector);
+  }
+
+  async canonize(input, options) {
+    const jsonld = this.injector.use('jsonld');
+    const opts = {
+      algorithm: 'URDNA2015',
+      format: 'application/n-quads',
+      expansionMap: options.expansionMap
+    };
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
     }
-  } else {
-    this._willSettleAt(resolve$$(entry), i);
+    return jsonld.canonize(input, opts);
   }
-};
 
-Enumerator.prototype._settledAt = function (state, i, value) {
-  var promise = this.promise;
+  async createVerifyData(input, options) {
+    // TODO: frame before getting signature, not just compact? considerations:
+    // should the assumption be (for this library) that the signature is on
+    // the top-level object and thus framing is unnecessary?
 
-  if (promise._state === PENDING) {
-    this._remaining--;
-
-    if (state === REJECTED) {
-      _reject(promise, value);
-    } else {
-      this._result[i] = value;
+    const jsonld = this.injector.use('jsonld');
+    const opts = {expansionMap: options.expansionMap};
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
     }
+    const compacted = await jsonld.compact(
+      input, constants.SECURITY_CONTEXT_URL, opts);
+
+    // TODO: will need to preserve `proof` when chained signature
+    // option is used and implemented in the future
+
+    // delete the existing proofs(s) prior to canonicalization
+    delete compacted.proof;
+
+    // ensure signature values are removed from proof node
+    const proof = await this.sanitizeProofNode(options.proof, options);
+
+    // concatenate hash of c14n proof options and hash of c14n document
+    const c14nProofOptions = await this.canonize(proof, options);
+    const c14nDocument = await this.canonize(compacted, options);
+    return {
+      data: this._sha256(c14nProofOptions).getBytes() +
+        this._sha256(c14nDocument).getBytes(),
+      encoding: 'binary'
+    };
   }
 
-  if (this._remaining === 0) {
-    fulfill(promise, this._result);
+  async sanitizeProofNode(proof, options) {
+    // `jws`,`signatureValue`,`proofValue` must not be included in the proof
+    // options
+    proof = util.deepClone(proof);
+    delete proof.jws;
+    delete proof.signatureValue;
+    delete proof.proofValue;
+    return proof;
   }
-};
 
-Enumerator.prototype._willSettleAt = function (promise, i) {
-  var enumerator = this;
+  async sign(input, options) {
+    // copy options for setting defaults
+    options = Object.assign({}, options || {});
 
-  subscribe(promise, undefined, function (value) {
-    return enumerator._settledAt(FULFILLED, i, value);
-  }, function (reason) {
-    return enumerator._settledAt(REJECTED, i, reason);
-  });
-};
+    // validate common options
+    if(options.creator !== undefined && typeof options.creator !== 'string') {
+      throw new TypeError('"options.creator" must be a URL string.');
+    }
+    if(options.domain !== undefined && typeof options.domain !== 'string') {
+      throw new TypeError('"options.domain" must be a string.');
+    }
+    if(options.nonce !== undefined && typeof options.nonce !== 'string') {
+      throw new TypeError('"options.nonce" must be a string.');
+    }
 
-/**
-  `Promise.all` accepts an array of promises, and returns a new promise which
-  is fulfilled with an array of fulfillment values for the passed promises, or
-  rejected with the reason of the first passed promise to be rejected. It casts all
-  elements of the passed iterable to promises as it runs this algorithm.
-
-  Example:
-
-  ```javascript
-  let promise1 = resolve(1);
-  let promise2 = resolve(2);
-  let promise3 = resolve(3);
-  let promises = [ promise1, promise2, promise3 ];
-
-  Promise.all(promises).then(function(array){
-    // The array here would be [ 1, 2, 3 ];
-  });
-  ```
-
-  If any of the `promises` given to `all` are rejected, the first promise
-  that is rejected will be given as an argument to the returned promises's
-  rejection handler. For example:
-
-  Example:
-
-  ```javascript
-  let promise1 = resolve(1);
-  let promise2 = reject(new Error("2"));
-  let promise3 = reject(new Error("3"));
-  let promises = [ promise1, promise2, promise3 ];
-
-  Promise.all(promises).then(function(array){
-    // Code here never runs because there are rejected promises!
-  }, function(error) {
-    // error.message === "2"
-  });
-  ```
-
-  @method all
-  @static
-  @param {Array} entries array of promises
-  @param {String} label optional string for labeling the promise.
-  Useful for tooling.
-  @return {Promise} promise that is fulfilled when all `promises` have been
-  fulfilled, or rejected if any of them become rejected.
-  @static
-*/
-function all(entries) {
-  return new Enumerator(this, entries).promise;
-}
-
-/**
-  `Promise.race` returns a new promise which is settled in the same way as the
-  first passed promise to settle.
-
-  Example:
-
-  ```javascript
-  let promise1 = new Promise(function(resolve, reject){
-    setTimeout(function(){
-      resolve('promise 1');
-    }, 200);
-  });
-
-  let promise2 = new Promise(function(resolve, reject){
-    setTimeout(function(){
-      resolve('promise 2');
-    }, 100);
-  });
-
-  Promise.race([promise1, promise2]).then(function(result){
-    // result === 'promise 2' because it was resolved before promise1
-    // was resolved.
-  });
-  ```
-
-  `Promise.race` is deterministic in that only the state of the first
-  settled promise matters. For example, even if other promises given to the
-  `promises` array argument are resolved, but the first settled promise has
-  become rejected before the other promises became fulfilled, the returned
-  promise will become rejected:
-
-  ```javascript
-  let promise1 = new Promise(function(resolve, reject){
-    setTimeout(function(){
-      resolve('promise 1');
-    }, 200);
-  });
-
-  let promise2 = new Promise(function(resolve, reject){
-    setTimeout(function(){
-      reject(new Error('promise 2'));
-    }, 100);
-  });
-
-  Promise.race([promise1, promise2]).then(function(result){
-    // Code here never runs
-  }, function(reason){
-    // reason.message === 'promise 2' because promise 2 became rejected before
-    // promise 1 became fulfilled
-  });
-  ```
-
-  An example real-world use case is implementing timeouts:
-
-  ```javascript
-  Promise.race([ajax('foo.json'), timeout(5000)])
-  ```
-
-  @method race
-  @static
-  @param {Array} promises array of promises to observe
-  Useful for tooling.
-  @return {Promise} a promise which settles in the same way as the first passed
-  promise to settle.
-*/
-function race(entries) {
-  /*jshint validthis:true */
-  var Constructor = this;
-
-  if (!isArray(entries)) {
-    return new Constructor(function (_, reject) {
-      return reject(new TypeError('You must pass an array to race.'));
-    });
-  } else {
-    return new Constructor(function (resolve, reject) {
-      var length = entries.length;
-      for (var i = 0; i < length; i++) {
-        Constructor.resolve(entries[i]).then(resolve, reject);
-      }
-    });
-  }
-}
-
-/**
-  `Promise.reject` returns a promise rejected with the passed `reason`.
-  It is shorthand for the following:
-
-  ```javascript
-  let promise = new Promise(function(resolve, reject){
-    reject(new Error('WHOOPS'));
-  });
-
-  promise.then(function(value){
-    // Code here doesn't run because the promise is rejected!
-  }, function(reason){
-    // reason.message === 'WHOOPS'
-  });
-  ```
-
-  Instead of writing the above, your code now simply becomes the following:
-
-  ```javascript
-  let promise = Promise.reject(new Error('WHOOPS'));
-
-  promise.then(function(value){
-    // Code here doesn't run because the promise is rejected!
-  }, function(reason){
-    // reason.message === 'WHOOPS'
-  });
-  ```
-
-  @method reject
-  @static
-  @param {Any} reason value that the returned promise will be rejected with.
-  Useful for tooling.
-  @return {Promise} a promise rejected with the given `reason`.
-*/
-function reject(reason) {
-  /*jshint validthis:true */
-  var Constructor = this;
-  var promise = new Constructor(noop);
-  _reject(promise, reason);
-  return promise;
-}
-
-function needsResolver() {
-  throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
-}
-
-function needsNew() {
-  throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
-}
-
-/**
-  Promise objects represent the eventual result of an asynchronous operation. The
-  primary way of interacting with a promise is through its `then` method, which
-  registers callbacks to receive either a promise's eventual value or the reason
-  why the promise cannot be fulfilled.
-
-  Terminology
-  -----------
-
-  - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
-  - `thenable` is an object or function that defines a `then` method.
-  - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
-  - `exception` is a value that is thrown using the throw statement.
-  - `reason` is a value that indicates why a promise was rejected.
-  - `settled` the final resting state of a promise, fulfilled or rejected.
-
-  A promise can be in one of three states: pending, fulfilled, or rejected.
-
-  Promises that are fulfilled have a fulfillment value and are in the fulfilled
-  state.  Promises that are rejected have a rejection reason and are in the
-  rejected state.  A fulfillment value is never a thenable.
-
-  Promises can also be said to *resolve* a value.  If this value is also a
-  promise, then the original promise's settled state will match the value's
-  settled state.  So a promise that *resolves* a promise that rejects will
-  itself reject, and a promise that *resolves* a promise that fulfills will
-  itself fulfill.
-
-
-  Basic Usage:
-  ------------
-
-  ```js
-  let promise = new Promise(function(resolve, reject) {
-    // on success
-    resolve(value);
-
-    // on failure
-    reject(reason);
-  });
-
-  promise.then(function(value) {
-    // on fulfillment
-  }, function(reason) {
-    // on rejection
-  });
-  ```
-
-  Advanced Usage:
-  ---------------
-
-  Promises shine when abstracting away asynchronous interactions such as
-  `XMLHttpRequest`s.
-
-  ```js
-  function getJSON(url) {
-    return new Promise(function(resolve, reject){
-      let xhr = new XMLHttpRequest();
-
-      xhr.open('GET', url);
-      xhr.onreadystatechange = handler;
-      xhr.responseType = 'json';
-      xhr.setRequestHeader('Accept', 'application/json');
-      xhr.send();
-
-      function handler() {
-        if (this.readyState === this.DONE) {
-          if (this.status === 200) {
-            resolve(this.response);
-          } else {
-            reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
-          }
+    // disallow dropping properties when expanding by default
+    if(options.expansionMap !== false) {
+      options.expansionMap = info => {
+        if(info.unmappedProperty) {
+          throw new Error('The property "' +
+             info.unmappedProperty + '" in the input ' +
+            'was not defined in the context.');
         }
       };
-    });
-  }
-
-  getJSON('/posts.json').then(function(json) {
-    // on fulfillment
-  }, function(reason) {
-    // on rejection
-  });
-  ```
-
-  Unlike callbacks, promises are great composable primitives.
-
-  ```js
-  Promise.all([
-    getJSON('/posts'),
-    getJSON('/comments')
-  ]).then(function(values){
-    values[0] // => postsJSON
-    values[1] // => commentsJSON
-
-    return values;
-  });
-  ```
-
-  @class Promise
-  @param {function} resolver
-  Useful for tooling.
-  @constructor
-*/
-function Promise(resolver) {
-  this[PROMISE_ID] = nextId();
-  this._result = this._state = undefined;
-  this._subscribers = [];
-
-  if (noop !== resolver) {
-    typeof resolver !== 'function' && needsResolver();
-    this instanceof Promise ? initializePromise(this, resolver) : needsNew();
-  }
-}
-
-Promise.all = all;
-Promise.race = race;
-Promise.resolve = resolve;
-Promise.reject = reject;
-Promise._setScheduler = setScheduler;
-Promise._setAsap = setAsap;
-Promise._asap = asap;
-
-Promise.prototype = {
-  constructor: Promise,
-
-  /**
-    The primary way of interacting with a promise is through its `then` method,
-    which registers callbacks to receive either a promise's eventual value or the
-    reason why the promise cannot be fulfilled.
-  
-    ```js
-    findUser().then(function(user){
-      // user is available
-    }, function(reason){
-      // user is unavailable, and you are given the reason why
-    });
-    ```
-  
-    Chaining
-    --------
-  
-    The return value of `then` is itself a promise.  This second, 'downstream'
-    promise is resolved with the return value of the first promise's fulfillment
-    or rejection handler, or rejected if the handler throws an exception.
-  
-    ```js
-    findUser().then(function (user) {
-      return user.name;
-    }, function (reason) {
-      return 'default name';
-    }).then(function (userName) {
-      // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
-      // will be `'default name'`
-    });
-  
-    findUser().then(function (user) {
-      throw new Error('Found user, but still unhappy');
-    }, function (reason) {
-      throw new Error('`findUser` rejected and we're unhappy');
-    }).then(function (value) {
-      // never reached
-    }, function (reason) {
-      // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
-      // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
-    });
-    ```
-    If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-  
-    ```js
-    findUser().then(function (user) {
-      throw new PedagogicalException('Upstream error');
-    }).then(function (value) {
-      // never reached
-    }).then(function (value) {
-      // never reached
-    }, function (reason) {
-      // The `PedgagocialException` is propagated all the way down to here
-    });
-    ```
-  
-    Assimilation
-    ------------
-  
-    Sometimes the value you want to propagate to a downstream promise can only be
-    retrieved asynchronously. This can be achieved by returning a promise in the
-    fulfillment or rejection handler. The downstream promise will then be pending
-    until the returned promise is settled. This is called *assimilation*.
-  
-    ```js
-    findUser().then(function (user) {
-      return findCommentsByAuthor(user);
-    }).then(function (comments) {
-      // The user's comments are now available
-    });
-    ```
-  
-    If the assimliated promise rejects, then the downstream promise will also reject.
-  
-    ```js
-    findUser().then(function (user) {
-      return findCommentsByAuthor(user);
-    }).then(function (comments) {
-      // If `findCommentsByAuthor` fulfills, we'll have the value here
-    }, function (reason) {
-      // If `findCommentsByAuthor` rejects, we'll have the reason here
-    });
-    ```
-  
-    Simple Example
-    --------------
-  
-    Synchronous Example
-  
-    ```javascript
-    let result;
-  
-    try {
-      result = findResult();
-      // success
-    } catch(reason) {
-      // failure
     }
-    ```
-  
-    Errback Example
-  
-    ```js
-    findResult(function(result, err){
-      if (err) {
-        // failure
-      } else {
-        // success
+
+    // build proof (aka signature options)
+    let proof;
+    if(options.proof) {
+      // use proof JSON-LD document passed to API
+      const jsonld = this.injector.use('jsonld');
+      const opts = {expansionMap: options.expansionMap};
+      if(options.documentLoader) {
+        opts.documentLoader = options.documentLoader;
       }
-    });
-    ```
-  
-    Promise Example;
-  
-    ```javascript
-    findResult().then(function(result){
-      // success
-    }, function(reason){
-      // failure
-    });
-    ```
-  
-    Advanced Example
-    --------------
-  
-    Synchronous Example
-  
-    ```javascript
-    let author, books;
-  
-    try {
-      author = findAuthor();
-      books  = findBooksByAuthor(author);
-      // success
-    } catch(reason) {
-      // failure
+      proof = await jsonld.compact(
+        options.proof, constants.SECURITY_CONTEXT_URL, opts);
+    } else {
+      // create proof JSON-LD document
+      proof = {'@context': constants.SECURITY_CONTEXT_URL};
     }
-    ```
-  
-    Errback Example
-  
-    ```js
-  
-    function foundBooks(books) {
-  
+
+    // set default `now` date if not given in `proof` or `options`
+    if(proof.created === undefined && options.date === undefined) {
+      options.date = new Date();
     }
-  
-    function failure(reason) {
-  
+
+    // ensure date is in string format
+    if(options.date !== undefined && typeof options.date !== 'string') {
+      // TODO: parse non-string date and force to w3c format?
+      options.date = util.w3cDate(options.date);
     }
-  
-    findAuthor(function(author, err){
-      if (err) {
-        failure(err);
-        // failure
-      } else {
-        try {
-          findBoooksByAuthor(author, function(books, err) {
-            if (err) {
-              failure(err);
-            } else {
-              try {
-                foundBooks(books);
-              } catch(reason) {
-                failure(reason);
-              }
-            }
-          });
-        } catch(error) {
-          failure(err);
+
+    // ensure algorithm is set
+    proof.type = options.algorithm;
+
+    // add API overrides
+    if(options.date !== undefined) {
+      proof.created = options.date;
+    }
+    if(options.creator !== undefined) {
+      proof.creator = options.creator;
+    }
+    if(options.domain !== undefined) {
+      proof.domain = options.domain;
+    }
+    if(options.nonce !== undefined) {
+      proof.nonce = options.nonce;
+    }
+
+    // produce data to sign
+    options.proof = proof;
+    const verifyData = await this.createVerifyData(input, options);
+
+    // create proof node
+    const proofNode = await this.createProofNode(verifyData, options);
+
+    // attach proof node
+    return this.attachProofNode(input, proofNode, options);
+  }
+
+  async createProofNode(verifyData, options) {
+    const proof = options.proof;
+    proof.jws = await this.createSignatureValue(verifyData, options);
+    return proof;
+  }
+
+  async attachProofNode(input, proofNode, options) {
+    // compact proof node to match input context
+    const tmp = {
+      'https://w3id.org/security#proof': {
+        '@graph': proofNode
+      }
+    };
+    const jsonld = this.injector.use('jsonld');
+    const ctx = jsonld.getValues(input, '@context');
+    const opts = {expansionMap: options.expansionMap};
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
+    }
+    const compactProofNode = await jsonld.compact(tmp, ctx, opts);
+
+    // TODO: it is unclear how the signature would be easily added without
+    // reshaping the input... so perhaps this library should just require
+    // the caller to accept that the signature will be added to the top
+    // level of the input
+
+    // attach signature node to cloned input and return it
+    const output = util.deepClone(input);
+    delete compactProofNode['@context'];
+    const proofKey = Object.keys(compactProofNode)[0];
+    jsonld.addValue(output, proofKey, compactProofNode[proofKey]);
+    return output;
+  }
+
+  async verify(framed, options) {
+    options = Object.assign({}, options || {});
+
+    const proof = framed.signature || framed.proof;
+    proof['@context'] = framed['@context'];
+
+    // destructure options
+    let {
+      maxTimestampDelta = (15 * 60),
+      checkNonce = () => (
+        proof.nonce === null || proof.nonce === undefined),
+      checkDomain = () => (
+        proof.domain === null || proof.domain === undefined),
+      checkTimestamp = () => {
+        const now = Date.now();
+        const delta = maxTimestampDelta * 1000;
+        const created = Date.parse(proof.created);
+        if(created < (now - delta) || created > (now + delta)) {
+          throw new Error('The digital signature timestamp is out of range.');
         }
-        // success
-      }
-    });
-    ```
-  
-    Promise Example;
-  
-    ```javascript
-    findAuthor().
-      then(findBooksByAuthor).
-      then(function(books){
-        // found books
-    }).catch(function(reason){
-      // something went wrong
-    });
-    ```
-  
-    @method then
-    @param {Function} onFulfilled
-    @param {Function} onRejected
-    Useful for tooling.
-    @return {Promise}
-  */
-  then: then,
+        return true;
+      },
+      checkKey = this.helper.checkKey.bind(this.helper),
+      publicKey: getPublicKey = this.helper.getPublicKey.bind(this.helper)
+    } = options;
 
-  /**
-    `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
-    as the catch block of a try/catch statement.
-  
-    ```js
-    function findAuthor(){
-      throw new Error('couldn't find that author');
+    // normalize function options
+    if(checkNonce === false) {
+      // not checking nonce, so return true
+      checkNonce = () => true;
     }
-  
-    // synchronous
-    try {
-      findAuthor();
-    } catch(reason) {
-      // something went wrong
+    if(checkDomain === false) {
+      // not checking domain, so return true
+      checkDomain = () => true;
     }
-  
-    // async with promises
-    findAuthor().catch(function(reason){
-      // something went wrong
+    if(checkTimestamp === false) {
+      // not checking timestamp, so return true
+      checkTimestamp = () => true;
+    }
+    if(typeof getPublicKey !== 'function') {
+      const key = getPublicKey;
+      getPublicKey = keyId => {
+        if(keyId !== key.id) {
+          throw new Error('Public key not found.');
+        }
+        return key;
+      };
+    }
+    checkNonce = util.normalizeAsyncFn(checkNonce, 2);
+    checkDomain = util.normalizeAsyncFn(checkDomain, 2);
+    checkTimestamp = util.normalizeAsyncFn(checkTimestamp, 2);
+    checkKey = util.normalizeAsyncFn(checkKey, 2);
+    getPublicKey = util.normalizeAsyncFn(getPublicKey, 2);
+
+    // run nonce, domain, and timestamp checks in parallel
+    const checks = await Promise.all([
+      checkNonce(proof.nonce, options),
+      checkDomain(proof.domain, options),
+      checkTimestamp(proof.date, options)
+    ]);
+
+    if(!checks[0]) {
+      throw new Error('The nonce is invalid.');
+    }
+    if(!checks[1]) {
+      throw new Error('The domain is invalid.');
+    }
+    if(!checks[2]) {
+      throw new Error('The timestamp is invalid.');
+    }
+
+    const keyOptions = Object.assign({}, options, {
+      proof,
+      keyType: this.requiredKeyType
     });
-    ```
-  
-    @method catch
-    @param {Function} onRejection
-    Useful for tooling.
-    @return {Promise}
-  */
-  'catch': function _catch(onRejection) {
-    return this.then(null, onRejection);
+
+    // get public key
+    const publicKey = await getPublicKey(proof.creator, keyOptions);
+
+    // TODO: should be able to override revocation check to ensure that
+    // signatures made prior to the revocation check could potentially still
+    // be verified
+
+    // ensure key is not revoked
+    if(publicKey.revoked !== undefined) {
+      throw new Error(
+        'The document was signed with a key that has been revoked.');
+    }
+
+    // ensure key is trusted before proceeding
+    const isKeyTrusted = await checkKey(publicKey, keyOptions);
+    if(!isKeyTrusted) {
+      throw new Error('The document was not signed with a trusted key.');
+    }
+
+    // validate key
+    await this.validateKey(publicKey, keyOptions);
+
+    // verify input
+    const verifyData = await this.createVerifyData(
+      framed, Object.assign({}, options, {
+        date: proof.created,
+        nonce: proof.nonce,
+        domain: proof.domain,
+        proof
+      }));
+
+    return this.verifyProofNode(
+      verifyData, proof,
+      Object.assign({}, options, {publicKey: publicKey}));
+  }
+
+  async verifyProofNode(verifyData, proof, options) {
+    throw new Error(
+      '"verifyProofNode" must be implemented in a derived class.');
+  }
+
+  // TODO: use node `crypto` and Buffers in node environment
+  // returns a forge buffer
+  _sha256(str, encoding) {
+    // browser or other environment
+    const forge = this.injector.use('forge');
+    const md = forge.md.sha256.create();
+    md.update(str, encoding || 'utf8');
+    return md.digest();
   }
 };
 
-function polyfill() {
-    var local = undefined;
+},{"../Helper":83,"../constants":85,"../util":96}],94:[function(require,module,exports){
+/*
+ * Copyright (c) 2017-2018 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
 
-    if (typeof global !== 'undefined') {
-        local = global;
-    } else if (typeof self !== 'undefined') {
-        local = self;
+const constants = require('../constants');
+const util = require('../util');
+const LinkedDataSignature = require('./LinkedDataSignature');
+
+module.exports = class LinkedDataSignature2015 extends LinkedDataSignature {
+  constructor(injector, algorithm = 'LinkedDataSignature2015') {
+    super(injector, algorithm);
+  }
+
+  async createProofNode(verifyData, options) {
+    const proof = options.proof;
+    proof.signatureValue = await this.createSignatureValue(verifyData, options);
+    return proof;
+  }
+
+  async attachProofNode(input, proofNode, options) {
+    // compact proof node to match input context
+    const tmp = {
+      'https://w3id.org/security#signature': proofNode
+    };
+    const jsonld = this.injector.use('jsonld');
+    const ctx = jsonld.getValues(input, '@context');
+    const opts = {expansionMap: options.expansionMap};
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
+    }
+    const compactProofNode = await jsonld.compact(tmp, ctx, opts);
+
+    // TODO: it is unclear how the signature would be easily added without
+    // reshaping the input... so perhaps this library should just require
+    // the caller to accept that the signature will be added to the top
+    // level of the input
+
+    // attach signature node to cloned input and return it
+    const output = util.deepClone(input);
+    delete compactProofNode['@context'];
+    const proofKey = Object.keys(compactProofNode)[0];
+    jsonld.addValue(output, proofKey, compactProofNode[proofKey]);
+    return output;
+  }
+
+  async createSignatureValue(verifyData, options) {
+    // TODO: support `sign` function via options instead of `privateKeyPem`
+    if(typeof options.privateKeyPem !== 'string') {
+      throw new TypeError(
+        '"options.privateKeyPem" must be a PEM formatted string.');
+    }
+
+    if(this.injector.env.nodejs) {
+      // optimize using node libraries
+      const crypto = this.injector.use('crypto');
+      const signer = crypto.createSign('RSA-SHA256');
+      signer.update(verifyData.data, verifyData.encoding);
+      return signer.sign(options.privateKeyPem, 'base64');
+    }
+
+    // browser or other environment
+    const forge = this.injector.use('forge');
+    const privateKey = forge.pki.privateKeyFromPem(options.privateKeyPem);
+    const md = forge.md.sha256.create();
+    md.update(verifyData.data, verifyData.encoding);
+    return forge.util.encode64(privateKey.sign(md));
+  }
+
+  async createVerifyData(input, options) {
+    // TODO: frame before getting signature, not just compact? considerations:
+    // should the assumption be (for this library) that the signature is on
+    // the top-level object and thus framing is unnecessary?
+
+    const jsonld = this.injector.use('jsonld');
+    const opts = {expansionMap: options.expansionMap};
+    if(options.documentLoader) {
+      opts.documentLoader = options.documentLoader;
+    }
+    const compacted = await jsonld.compact(
+      input, constants.SECURITY_CONTEXT_URL, opts);
+
+    // TODO: will need to preserve `signature` when chained signature
+    // option is used and implemented in the future
+
+    // delete the existing signature(s) prior to canonicalization
+    delete compacted.signature;
+
+    const c14n = await this.canonize(compacted, options);
+
+    let verifyData = '';
+    const headers = {
+      'http://purl.org/dc/elements/1.1/created': options.date,
+      'https://w3id.org/security#domain': options.domain,
+      'https://w3id.org/security#nonce': options.nonce
+    };
+    // add headers in lexicographical order
+    const keys = Object.keys(headers).sort();
+    for(let i = 0; i < keys.length; ++i) {
+      const key = keys[i];
+      const value = headers[key];
+      if(!(value === null || value === undefined)) {
+        verifyData += key + ': ' + value + '\n';
+      }
+    }
+    verifyData += c14n;
+    return {
+      data: verifyData,
+      encoding: 'utf8'
+    };
+  }
+
+  async verifyProofNode(verifyData, proof, options) {
+    const publicKeyPem = options.publicKey.publicKeyPem;
+    if(typeof publicKeyPem !== 'string') {
+      throw new TypeError(
+        'Could not verify signature; invalid "publicKeyPem".');
+    }
+
+    if(this.injector.env.nodejs) {
+      // optimize using node libraries
+      const crypto = this.injector.use('crypto');
+      const verifier = crypto.createVerify('RSA-SHA256');
+      verifier.update(verifyData.data, verifyData.encoding);
+      return verifier.verify(publicKeyPem, proof.signatureValue, 'base64');
+    }
+
+    // browser or other environment
+    const forge = this.injector.use('forge');
+    const publicKey = forge.pki.publicKeyFromPem(publicKeyPem);
+    const md = forge.md.sha256.create();
+    md.update(verifyData.data, verifyData.encoding);
+    return publicKey.verify(
+      md.digest().bytes(), forge.util.decode64(proof.signatureValue));
+  }
+
+  async validateKey(key, options) {
+    if(typeof key.publicKeyPem !== 'string') {
+      throw new TypeError(
+        'Unknown public key encoding. Public key encoding must be ' +
+        '"publicKeyPem".');
+    }
+    const jsonld = this.injector.use('jsonld');
+    if(!jsonld.hasValue(key, 'type', 'CryptographicKey')) {
+      throw new TypeError(
+        'Invalid key type. Key type must be "CryptographicKey".');
+    }
+  }
+};
+
+},{"../constants":85,"../util":96,"./LinkedDataSignature":93}],95:[function(require,module,exports){
+(function (Buffer){
+/**
+ * Copyright (c) 2017-2018 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
+
+const LinkedDataSignature = require('./LinkedDataSignature');
+const util = require('../util');
+
+module.exports = class RsaSignature2018 extends LinkedDataSignature {
+  constructor(injector, algorithm = 'RsaSignature2018') {
+    super(injector, algorithm);
+    this.requiredKeyType = 'RsaVerificationKey2018';
+  }
+
+  async createSignatureValue(verifyData, options) {
+    const forge = this.injector.use('forge');
+
+    // TODO: should abstract JWS signing bits out for reuse elsewhere
+
+    // JWS header
+    const header = this.createJwsHeader();
+
+    /*
+    +-------+-----------------------------------------------------------+
+    | "b64" | JWS Signing Input Formula                                 |
+    +-------+-----------------------------------------------------------+
+    | true  | ASCII(BASE64URL(UTF8(JWS Protected Header)) || '.' ||     |
+    |       | BASE64URL(JWS Payload))                                   |
+    |       |                                                           |
+    | false | ASCII(BASE64URL(UTF8(JWS Protected Header)) || '.') ||    |
+    |       | JWS Payload                                               |
+    +-------+-----------------------------------------------------------+
+    */
+
+    const encodedHeader = util.encodeBase64Url(
+      JSON.stringify(header), {forge});
+
+    let encodedSignature;
+    if(this.injector.env.nodejs) {
+      // FIXME: better abstract for future suites
+
+      // optimize using node 8.0+ libraries
+      const crypto = this.injector.use('crypto');
+      if('RSA_PKCS1_PSS_PADDING' in crypto.constants) {
+        const signer = crypto.createSign('RSA-SHA256');
+
+        // build signing input per above comment
+        signer.update(encodedHeader + '.', 'utf8');
+        signer.update(new Buffer(verifyData.data, verifyData.encoding));
+        const buffer = signer.sign(Object.assign({
+          key: options.privateKeyPem
+        }, this.createPss()));
+        encodedSignature = util.encodeBase64Url(
+          buffer.toString('binary'), {forge});
+      }
+    }
+
+    if(!encodedSignature) {
+      // browser or other environment (including node 6.x)
+      const privateKey = forge.pki.privateKeyFromPem(options.privateKeyPem);
+      const md = forge.md.sha256.create();
+      // build signing input per above comment
+      md.update(encodedHeader + '.', 'utf8');
+      md.update(verifyData.data, verifyData.encoding);
+      const pss = this.createPss(forge);
+      const binaryString = privateKey.sign(md, pss);
+      encodedSignature = util.encodeBase64Url(binaryString, {forge});
+    }
+
+    // create detached content signature
+    return encodedHeader + '..' + encodedSignature;
+  }
+
+  async verifyProofNode(verifyData, proof, options) {
+    const forge = this.injector.use('forge');
+
+    const {publicKeyPem} = options.publicKey;
+
+    // add payload into detached content signature
+    const [encodedHeader, payload, encodedSignature] = proof.jws.split('.');
+
+    const header = JSON.parse(util.decodeBase64Url(encodedHeader, {forge}));
+    if(!(header && typeof header === 'object')) {
+      throw new Error('Invalid JWS header.');
+    }
+
+    // confirm header matches all expectations
+    this.checkJwsHeader(header);
+
+    const rawSignature = util.decodeBase64Url(encodedSignature, {forge});
+
+    if(this.injector.env.nodejs) {
+      // optimize using node 8.0+ libraries
+      const crypto = this.injector.use('crypto');
+      if('RSA_PKCS1_PSS_PADDING' in crypto.constants) {
+        const crypto = this.injector.use('crypto');
+        const verifier = crypto.createVerify('RSA-SHA256');
+        // rebuild signing input per JWS spec
+        verifier.update(encodedHeader + '.', 'utf8');
+        verifier.update(new Buffer(verifyData.data, verifyData.encoding));
+        return verifier.verify(Object.assign({
+          key: publicKeyPem
+        }, this.createPss()), new Buffer(rawSignature, 'binary'));
+      }
+    }
+
+    // browser or other environment
+    const publicKey = forge.pki.publicKeyFromPem(publicKeyPem);
+    const md = forge.md.sha256.create();
+    // rebuild signing input per JWS spec
+    md.update(encodedHeader + '.', 'utf8');
+    md.update(verifyData.data, verifyData.encoding);
+    return publicKey.verify(
+      md.digest().bytes(), rawSignature, this.createPss(forge));
+  }
+
+  async validateKey(key, options) {
+    if(typeof key.publicKeyPem !== 'string') {
+      throw new TypeError(
+        'Unknown public key encoding. Public key encoding must be ' +
+        '"publicKeyPem".');
+    }
+    const jsonld = this.injector.use('jsonld');
+    if(!jsonld.hasValue(key, 'type', this.requiredKeyType)) {
+      throw new TypeError(
+        `Invalid key type. Key type must be "${this.requiredKeyType}".`);
+    }
+  }
+
+  createJwsHeader() {
+    const header = {
+      alg: 'PS256',
+      b64: false,
+      crit: ['b64']
+    };
+    return header;
+  }
+
+  checkJwsHeader(header) {
+    /*
+    const expectedHeader = {
+      alg: 'PS256',
+      b64: false,
+      crit: ['b64']
+    };
+    */
+    if(!(header.alg === 'PS256' && header.b64 === false &&
+      Array.isArray(header.crit) && header.crit.length === 1 &&
+      header.crit[0] === 'b64') && Object.keys(header).length === 3) {
+      throw new Error('Invalid JWS header parameters for RsaSignature2018.');
+    }
+  }
+
+  createPss(forge) {
+    // Note: Per rfc7518, the digest algorithm for PS256 is SHA-256,
+    // https://tools.ietf.org/html/rfc7518
+
+    // sign data using RSASSA-PSS where PSS uses a SHA-256 hash,
+    // a SHA-256 based masking function MGF1, and a 32 byte salt to match
+    // the hash size
+    if(forge) {
+      const md = forge.md.sha256.create();
+      return forge.pss.create({
+        md,
+        mgf: forge.mgf.mgf1.create(forge.md.sha256.create()),
+        saltLength: md.digestLength
+      });
     } else {
-        try {
-            local = Function('return this')();
-        } catch (e) {
-            throw new Error('polyfill failed because global object is unavailable in this environment');
-        }
+      const crypto = require('crypto');
+      return {
+        padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
+        saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
+      };
+    }
+  }
+};
+
+}).call(this,require("buffer").Buffer)
+},{"../util":96,"./LinkedDataSignature":93,"buffer":61,"crypto":55}],96:[function(require,module,exports){
+(function (process,setImmediate){
+/*
+ * Copyright (c) 2017 Digital Bazaar, Inc. All rights reserved.
+ */
+'use strict';
+
+const api = {};
+module.exports = api;
+
+// define setImmediate and nextTick
+//// nextTick implementation with browser-compatible fallback ////
+// from https://github.com/caolan/async/blob/master/lib/async.js
+
+// capture the global reference to guard against fakeTimer mocks
+const _setImmediate = typeof setImmediate === 'function' && setImmediate;
+
+const _delay = _setImmediate ?
+  // not a direct alias (for IE10 compatibility)
+  fn => _setImmediate(fn) :
+  fn => setTimeout(fn, 0);
+
+if(typeof process === 'object' && typeof process.nextTick === 'function') {
+  api.nextTick = process.nextTick;
+} else {
+  api.nextTick = _delay;
+}
+api.setImmediate = _setImmediate ? _delay : api.nextTick;
+
+/**
+ * Clones a value. If the value is an array or an object it will be deep cloned.
+ *
+ * @param value the value to clone.
+ *
+ * @return the cloned value.
+ */
+api.deepClone = value => {
+  if(value && typeof value === 'object') {
+    let rval;
+    if(Array.isArray(value)) {
+      rval = new Array(value.length);
+      for(let i = 0; i < rval.length; ++i) {
+        rval[i] = api.deepClone(value[i]);
+      }
+    } else {
+      rval = {};
+      for(let j in value) {
+        rval[j] = api.deepClone(value[j]);
+      }
+    }
+    return rval;
+  }
+  return value;
+};
+
+/**
+ * Converts the given date into W3C datetime format (eg: 2011-03-09T21:55:41Z).
+ *
+ * @param date the date to convert.
+ *
+ * @return the date in W3C datetime format.
+ */
+api.w3cDate = date => {
+  if(date === undefined || date === null) {
+    date = new Date();
+  } else if(typeof date === 'number' || typeof date === 'string') {
+    date = new Date(date);
+  }
+
+  return date.getUTCFullYear() + '-' +
+    _zeroFill(date.getUTCMonth() + 1) + '-' +
+    _zeroFill(date.getUTCDate()) + 'T' +
+    _zeroFill(date.getUTCHours()) + ':' +
+    _zeroFill(date.getUTCMinutes()) + ':' +
+    _zeroFill(date.getUTCSeconds()) + 'Z';
+};
+
+api.callbackify = fn => {
+  return async function(...args) {
+    const callback = args[args.length - 1];
+    if(typeof callback === 'function') {
+      args.pop();
     }
 
-    var P = local.Promise;
-
-    if (P) {
-        var promiseToString = null;
-        try {
-            promiseToString = Object.prototype.toString.call(P.resolve());
-        } catch (e) {
-            // silently ignored
-        }
-
-        if (promiseToString === '[object Promise]' && !P.cast) {
-            return;
-        }
+    let result;
+    try {
+      result = await fn.apply(null, args);
+    } catch(e) {
+      if(typeof callback === 'function') {
+        return _invokeCallback(callback, e);
+      }
+      throw e;
     }
 
-    local.Promise = Promise;
+    if(typeof callback === 'function') {
+      return _invokeCallback(callback, null, result);
+    }
+
+    return result;
+  };
+};
+
+api.normalizeAsyncFn = (fn, promiseFnLength) => {
+  // ensure promise-based function can be called with a callback
+  if(fn.length <= promiseFnLength) {
+    return api.callbackify(fn);
+  }
+
+  // ensure callback-based function will return a Promise
+  return async function(...args) {
+    const callback = arguments[promiseFnLength];
+    if(typeof callback === 'function') {
+      args.pop();
+    }
+    return new Promise((resolve, reject) => {
+      args.push((err, result) => {
+        if(typeof callback === 'function') {
+          return _invokeCallback(callback, err, result);
+        } else if(err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+      try {
+        fn.apply(null, args);
+      } catch(e) {
+        if(typeof callback === 'function') {
+          return _invokeCallback(callback, e);
+        }
+        reject(e);
+      }
+    });
+  };
+};
+
+function _invokeCallback(callback, err, result) {
+  // execute on next tick to prevent "unhandled rejected promise"
+  // and simulate what would have happened in a promiseless API
+  api.nextTick(() => callback(err, result));
 }
 
-// Strange compat..
-Promise.polyfill = polyfill;
-Promise.Promise = Promise;
+function _zeroFill(num) {
+  return (num < 10) ? '0' + num : '' + num;
+}
 
-return Promise;
+/**
+ * Encodes input according to the "Base64url Encoding" format as specified
+ * in JSON Web Signature (JWS) RFC7517. A URL safe character set is used and
+ * trailing '=', line breaks, whitespace, and other characters are omitted.
+ *
+ * @param input the data to encode.
+ * @param options
+ *          forge: forge library.
+ *
+ * @return the encoded value.
+ */
+api.encodeBase64Url = (input, {forge}) => {
+  const enc = forge.util.encode64(input);
+  return enc
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+};
 
-})));
+/**
+ * Decodes input according to the "Base64url Encoding" format as specified
+ * in JSON Web Signature (JWS) RFC7517. A URL safe character set is used and
+ * trailing '=', line breaks, whitespace, and other characters are omitted.
+ *
+ * @param input the data to decode.
+ * @param options
+ *          forge: forge library.
+ *
+ * @return the decoded value.
+ */
+api.decodeBase64Url = (input, {forge}) => {
+  let normalInput = input
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+  const mod4 = normalInput.length % 4;
+  if(mod4 === 0) {
+    // pass
+  } else if(mod4 === 2) {
+    normalInput = normalInput + '==';
+  } else if(mod4 === 3) {
+    normalInput = normalInput + '=';
+  } else {
+    throw new Error('Illegal base64 string.');
+  }
+  return forge.util.decode64(normalInput);
+};
 
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":91}],85:[function(require,module,exports){
+}).call(this,require('_process'),require("timers").setImmediate)
+},{"_process":103,"timers":139}],97:[function(require,module,exports){
 // Ignore module for browserify (see package.json)
-},{}],86:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 (function (process,global,setImmediate,__argument0,__argument1,__argument2,__argument3,__dirname){
 /**
  * A JavaScript implementation of the JSON-LD API.
@@ -23475,7 +23184,7 @@ return factory;
 })();
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate,arguments[3],arguments[4],arguments[5],arguments[6],"/node_modules/jsonld/js")
-},{"_process":91,"crypto":85,"es6-promise":75,"http":85,"jsonld-request":85,"pkginfo":85,"request":85,"timers":127,"util":85,"xmldom":85}],87:[function(require,module,exports){
+},{"_process":103,"crypto":97,"es6-promise":75,"http":97,"jsonld-request":97,"pkginfo":97,"request":97,"timers":139,"util":97,"xmldom":97}],99:[function(require,module,exports){
 (function (Buffer){
 'use strict'
 var inherits = require('inherits')
@@ -23624,7 +23333,7 @@ function fnI (a, b, c, d, m, k, s) {
 module.exports = MD5
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":61,"hash-base":77,"inherits":80}],88:[function(require,module,exports){
+},{"buffer":61,"hash-base":77,"inherits":80}],100:[function(require,module,exports){
 (function (Buffer){
 // constant-space merkle root calculation algorithm
 module.exports = function fastRoot (values, digestFn) {
@@ -23652,7 +23361,7 @@ module.exports = function fastRoot (values, digestFn) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":61}],89:[function(require,module,exports){
+},{"buffer":61}],101:[function(require,module,exports){
 (function (process){
 // .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
 // backported and transplited with Babel, with backwards-compat fixes
@@ -23958,7 +23667,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":91}],90:[function(require,module,exports){
+},{"_process":103}],102:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -24006,7 +23715,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 
 
 }).call(this,require('_process'))
-},{"_process":91}],91:[function(require,module,exports){
+},{"_process":103}],103:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -24192,7 +23901,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],92:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -24729,7 +24438,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],93:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 var OPS = require('bitcoin-ops')
 
 function encodingLength (i) {
@@ -24808,7 +24517,7 @@ module.exports = {
   decode: decode
 }
 
-},{"bitcoin-ops":16}],94:[function(require,module,exports){
+},{"bitcoin-ops":16}],106:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -24894,7 +24603,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],95:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -24981,13 +24690,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],96:[function(require,module,exports){
+},{}],108:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":94,"./encode":95}],97:[function(require,module,exports){
+},{"./decode":106,"./encode":107}],109:[function(require,module,exports){
 (function (process,global){
 'use strict'
 
@@ -25029,10 +24738,10 @@ function randomBytes (size, cb) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":91,"safe-buffer":112}],98:[function(require,module,exports){
+},{"_process":103,"safe-buffer":124}],110:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":99}],99:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":111}],111:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -25164,7 +24873,7 @@ Duplex.prototype._destroy = function (err, cb) {
 
   pna.nextTick(cb, err);
 };
-},{"./_stream_readable":101,"./_stream_writable":103,"core-util-is":65,"inherits":80,"process-nextick-args":90}],100:[function(require,module,exports){
+},{"./_stream_readable":113,"./_stream_writable":115,"core-util-is":65,"inherits":80,"process-nextick-args":102}],112:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -25212,7 +24921,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":102,"core-util-is":65,"inherits":80}],101:[function(require,module,exports){
+},{"./_stream_transform":114,"core-util-is":65,"inherits":80}],113:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -26234,7 +25943,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":99,"./internal/streams/BufferList":104,"./internal/streams/destroy":105,"./internal/streams/stream":106,"_process":91,"core-util-is":65,"events":76,"inherits":80,"isarray":82,"process-nextick-args":90,"safe-buffer":112,"string_decoder/":126,"util":55}],102:[function(require,module,exports){
+},{"./_stream_duplex":111,"./internal/streams/BufferList":116,"./internal/streams/destroy":117,"./internal/streams/stream":118,"_process":103,"core-util-is":65,"events":76,"inherits":80,"isarray":82,"process-nextick-args":102,"safe-buffer":124,"string_decoder/":138,"util":55}],114:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -26449,7 +26158,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":99,"core-util-is":65,"inherits":80}],103:[function(require,module,exports){
+},{"./_stream_duplex":111,"core-util-is":65,"inherits":80}],115:[function(require,module,exports){
 (function (process,global,setImmediate){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -27139,7 +26848,7 @@ Writable.prototype._destroy = function (err, cb) {
   cb(err);
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate)
-},{"./_stream_duplex":99,"./internal/streams/destroy":105,"./internal/streams/stream":106,"_process":91,"core-util-is":65,"inherits":80,"process-nextick-args":90,"safe-buffer":112,"timers":127,"util-deprecate":138}],104:[function(require,module,exports){
+},{"./_stream_duplex":111,"./internal/streams/destroy":117,"./internal/streams/stream":118,"_process":103,"core-util-is":65,"inherits":80,"process-nextick-args":102,"safe-buffer":124,"timers":139,"util-deprecate":150}],116:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -27219,7 +26928,7 @@ if (util && util.inspect && util.inspect.custom) {
     return this.constructor.name + ' ' + obj;
   };
 }
-},{"safe-buffer":112,"util":55}],105:[function(require,module,exports){
+},{"safe-buffer":124,"util":55}],117:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -27294,13 +27003,13 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":90}],106:[function(require,module,exports){
+},{"process-nextick-args":102}],118:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":76}],107:[function(require,module,exports){
+},{"events":76}],119:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":108}],108:[function(require,module,exports){
+},{"./readable":120}],120:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -27309,13 +27018,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":99,"./lib/_stream_passthrough.js":100,"./lib/_stream_readable.js":101,"./lib/_stream_transform.js":102,"./lib/_stream_writable.js":103}],109:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":111,"./lib/_stream_passthrough.js":112,"./lib/_stream_readable.js":113,"./lib/_stream_transform.js":114,"./lib/_stream_writable.js":115}],121:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":108}],110:[function(require,module,exports){
+},{"./readable":120}],122:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":103}],111:[function(require,module,exports){
+},{"./lib/_stream_writable.js":115}],123:[function(require,module,exports){
 'use strict'
 var Buffer = require('buffer').Buffer
 var inherits = require('inherits')
@@ -27480,7 +27189,7 @@ function fn5 (a, b, c, d, e, m, k, s) {
 
 module.exports = RIPEMD160
 
-},{"buffer":61,"hash-base":77,"inherits":80}],112:[function(require,module,exports){
+},{"buffer":61,"hash-base":77,"inherits":80}],124:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -27544,7 +27253,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":61}],113:[function(require,module,exports){
+},{"buffer":61}],125:[function(require,module,exports){
 var Buffer = require('safe-buffer').Buffer
 
 // prototype class for hash functions
@@ -27627,7 +27336,7 @@ Hash.prototype._update = function () {
 
 module.exports = Hash
 
-},{"safe-buffer":112}],114:[function(require,module,exports){
+},{"safe-buffer":124}],126:[function(require,module,exports){
 var exports = module.exports = function SHA (algorithm) {
   algorithm = algorithm.toLowerCase()
 
@@ -27644,7 +27353,7 @@ exports.sha256 = require('./sha256')
 exports.sha384 = require('./sha384')
 exports.sha512 = require('./sha512')
 
-},{"./sha":115,"./sha1":116,"./sha224":117,"./sha256":118,"./sha384":119,"./sha512":120}],115:[function(require,module,exports){
+},{"./sha":127,"./sha1":128,"./sha224":129,"./sha256":130,"./sha384":131,"./sha512":132}],127:[function(require,module,exports){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-0, as defined
  * in FIPS PUB 180-1
@@ -27740,7 +27449,7 @@ Sha.prototype._hash = function () {
 
 module.exports = Sha
 
-},{"./hash":113,"inherits":80,"safe-buffer":112}],116:[function(require,module,exports){
+},{"./hash":125,"inherits":80,"safe-buffer":124}],128:[function(require,module,exports){
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -27841,7 +27550,7 @@ Sha1.prototype._hash = function () {
 
 module.exports = Sha1
 
-},{"./hash":113,"inherits":80,"safe-buffer":112}],117:[function(require,module,exports){
+},{"./hash":125,"inherits":80,"safe-buffer":124}],129:[function(require,module,exports){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
  * in FIPS 180-2
@@ -27896,7 +27605,7 @@ Sha224.prototype._hash = function () {
 
 module.exports = Sha224
 
-},{"./hash":113,"./sha256":118,"inherits":80,"safe-buffer":112}],118:[function(require,module,exports){
+},{"./hash":125,"./sha256":130,"inherits":80,"safe-buffer":124}],130:[function(require,module,exports){
 /**
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
  * in FIPS 180-2
@@ -28033,7 +27742,7 @@ Sha256.prototype._hash = function () {
 
 module.exports = Sha256
 
-},{"./hash":113,"inherits":80,"safe-buffer":112}],119:[function(require,module,exports){
+},{"./hash":125,"inherits":80,"safe-buffer":124}],131:[function(require,module,exports){
 var inherits = require('inherits')
 var SHA512 = require('./sha512')
 var Hash = require('./hash')
@@ -28092,7 +27801,7 @@ Sha384.prototype._hash = function () {
 
 module.exports = Sha384
 
-},{"./hash":113,"./sha512":120,"inherits":80,"safe-buffer":112}],120:[function(require,module,exports){
+},{"./hash":125,"./sha512":132,"inherits":80,"safe-buffer":124}],132:[function(require,module,exports){
 var inherits = require('inherits')
 var Hash = require('./hash')
 var Buffer = require('safe-buffer').Buffer
@@ -28354,7 +28063,7 @@ Sha512.prototype._hash = function () {
 
 module.exports = Sha512
 
-},{"./hash":113,"inherits":80,"safe-buffer":112}],121:[function(require,module,exports){
+},{"./hash":125,"inherits":80,"safe-buffer":124}],133:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -28483,7 +28192,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":76,"inherits":80,"readable-stream/duplex.js":98,"readable-stream/passthrough.js":107,"readable-stream/readable.js":108,"readable-stream/transform.js":109,"readable-stream/writable.js":110}],122:[function(require,module,exports){
+},{"events":76,"inherits":80,"readable-stream/duplex.js":110,"readable-stream/passthrough.js":119,"readable-stream/readable.js":120,"readable-stream/transform.js":121,"readable-stream/writable.js":122}],134:[function(require,module,exports){
 (function (global){
 var ClientRequest = require('./lib/request')
 var response = require('./lib/response')
@@ -28571,7 +28280,7 @@ http.METHODS = [
 	'UNSUBSCRIBE'
 ]
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./lib/request":124,"./lib/response":125,"builtin-status-codes":62,"url":136,"xtend":144}],123:[function(require,module,exports){
+},{"./lib/request":136,"./lib/response":137,"builtin-status-codes":62,"url":148,"xtend":156}],135:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableStream)
 
@@ -28648,7 +28357,7 @@ function isFunction (value) {
 xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],124:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -28979,7 +28688,7 @@ var unsafeHeaders = [
 ]
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":123,"./response":125,"_process":91,"buffer":61,"inherits":80,"readable-stream":108,"to-arraybuffer":128}],125:[function(require,module,exports){
+},{"./capability":135,"./response":137,"_process":103,"buffer":61,"inherits":80,"readable-stream":120,"to-arraybuffer":140}],137:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -29207,7 +28916,7 @@ IncomingMessage.prototype._onXHRProgress = function () {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":123,"_process":91,"buffer":61,"inherits":80,"readable-stream":108}],126:[function(require,module,exports){
+},{"./capability":135,"_process":103,"buffer":61,"inherits":80,"readable-stream":120}],138:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -29504,7 +29213,7 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":112}],127:[function(require,module,exports){
+},{"safe-buffer":124}],139:[function(require,module,exports){
 (function (setImmediate,clearImmediate){
 var nextTick = require('process/browser.js').nextTick;
 var apply = Function.prototype.apply;
@@ -29583,7 +29292,7 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
   delete immediateIds[id];
 };
 }).call(this,require("timers").setImmediate,require("timers").clearImmediate)
-},{"process/browser.js":91,"timers":127}],128:[function(require,module,exports){
+},{"process/browser.js":103,"timers":139}],140:[function(require,module,exports){
 var Buffer = require('buffer').Buffer
 
 module.exports = function (buf) {
@@ -29612,7 +29321,7 @@ module.exports = function (buf) {
 	}
 }
 
-},{"buffer":61}],129:[function(require,module,exports){
+},{"buffer":61}],141:[function(require,module,exports){
 // Copyright (c) 2017 Pieter Wuille
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29730,7 +29439,7 @@ function decode (bechString) {
   return {hrp: hrp, data: data.slice(0, data.length - 6)};
 }
 
-},{}],130:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 let request = obj => {
@@ -29764,7 +29473,7 @@ let request = obj => {
 module.exports = {
   request: request
 }
-},{"xmlhttprequest":143}],131:[function(require,module,exports){
+},{"xmlhttprequest":155}],143:[function(require,module,exports){
 var bech32 = require('./bech32');
 var promisifiedRequests = require('./promisifiedRequests');
 
@@ -30087,7 +29796,7 @@ txDetailsFromTxid("2960626c1c538ef120743753d834dd493361177edea2985caf1a678f690e0
 
 
 
-},{"./bech32":129,"./promisifiedRequests":130}],132:[function(require,module,exports){
+},{"./bech32":141,"./promisifiedRequests":142}],144:[function(require,module,exports){
 var native = require('./native')
 
 function getTypeName (fn) {
@@ -30193,7 +29902,7 @@ module.exports = {
   getValueTypeName: getValueTypeName
 }
 
-},{"./native":135}],133:[function(require,module,exports){
+},{"./native":147}],145:[function(require,module,exports){
 (function (Buffer){
 var NATIVE = require('./native')
 var ERRORS = require('./errors')
@@ -30269,7 +29978,7 @@ for (var typeName in types) {
 module.exports = types
 
 }).call(this,{"isBuffer":require("../is-buffer/index.js")})
-},{"../is-buffer/index.js":81,"./errors":132,"./native":135}],134:[function(require,module,exports){
+},{"../is-buffer/index.js":81,"./errors":144,"./native":147}],146:[function(require,module,exports){
 var ERRORS = require('./errors')
 var NATIVE = require('./native')
 
@@ -30509,7 +30218,7 @@ typeforce.TfPropertyTypeError = TfPropertyTypeError
 
 module.exports = typeforce
 
-},{"./errors":132,"./extra":133,"./native":135}],135:[function(require,module,exports){
+},{"./errors":144,"./extra":145,"./native":147}],147:[function(require,module,exports){
 var types = {
   Array: function (value) { return value !== null && value !== undefined && value.constructor === Array },
   Boolean: function (value) { return typeof value === 'boolean' },
@@ -30532,7 +30241,7 @@ for (var typeName in types) {
 
 module.exports = types
 
-},{}],136:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -31266,7 +30975,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":137,"punycode":92,"querystring":96}],137:[function(require,module,exports){
+},{"./util":149,"punycode":104,"querystring":108}],149:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -31284,7 +30993,7 @@ module.exports = {
   }
 };
 
-},{}],138:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 (function (global){
 
 /**
@@ -31355,11 +31064,11 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],139:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 arguments[4][6][0].apply(exports,arguments)
-},{"dup":6}],140:[function(require,module,exports){
+},{"dup":6}],152:[function(require,module,exports){
 arguments[4][7][0].apply(exports,arguments)
-},{"./support/isBuffer":139,"_process":91,"dup":7,"inherits":80}],141:[function(require,module,exports){
+},{"./support/isBuffer":151,"_process":103,"dup":7,"inherits":80}],153:[function(require,module,exports){
 'use strict'
 var Buffer = require('safe-buffer').Buffer
 
@@ -31451,7 +31160,7 @@ function encodingLength (number) {
 
 module.exports = { encode: encode, decode: decode, encodingLength: encodingLength }
 
-},{"safe-buffer":112}],142:[function(require,module,exports){
+},{"safe-buffer":124}],154:[function(require,module,exports){
 (function (Buffer){
 var bs58check = require('bs58check')
 
@@ -31518,7 +31227,7 @@ module.exports = {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"bs58check":60,"buffer":61}],143:[function(require,module,exports){
+},{"bs58check":60,"buffer":61}],155:[function(require,module,exports){
 (function (process,Buffer){
 /**
  * Wrapper for built-in http.js to emulate the browser XMLHttpRequest object.
@@ -32142,7 +31851,7 @@ exports.XMLHttpRequest = function() {
 };
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":91,"buffer":61,"child_process":56,"fs":56,"http":122,"https":78,"url":136}],144:[function(require,module,exports){
+},{"_process":103,"buffer":61,"child_process":56,"fs":56,"http":134,"https":78,"url":148}],156:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -32163,7 +31872,7 @@ function extend() {
     return target
 }
 
-},{}],145:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -32259,14 +31968,14 @@ module.exports = {
 };
 
 }).call(this,require('_process'))
-},{"_process":91,"bitcoinjs-lib":26,"jsonld":86,"jsonld-signatures":83}],146:[function(require,module,exports){
+},{"_process":103,"bitcoinjs-lib":26,"jsonld":98,"jsonld-signatures":89}],158:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
 var bitcoin = require('bitcoinjs-lib');
 var txRefConversion = require("txref-conversion-js");
 
-var BTCR_PREFIX = "did:btcr";
+var BTCR_PREFIX = "did:btcr:";
 var COMPRESSED_PUBLIC_KEY_BYTE_LEN = 33;
 var COMPRESSED_PUBLIC_KEY_HEX_LEN = COMPRESSED_PUBLIC_KEY_BYTE_LEN * 2;
 
@@ -32287,7 +31996,7 @@ var ensureTxref = function ensureTxref(txrefCandidate) {
 
     var txref = txrefCandidate;
     if (txrefCandidate.startsWith(BTCR_PREFIX)) {
-        txref = txrefCandidate.substr(BTCR_PREFIX.length + 1);
+        txref = txrefCandidate.substr(BTCR_PREFIX.length);
     }
 
     if (!txref.startsWith("txtest") && txref.startsWith("x")) {
@@ -32367,5 +32076,5 @@ module.exports = {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"bitcoinjs-lib":26,"buffer":61,"txref-conversion-js":131}]},{},[3])(3)
+},{"bitcoinjs-lib":26,"buffer":61,"txref-conversion-js":143}]},{},[3])(3)
 });
