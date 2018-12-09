@@ -13,7 +13,7 @@
     "bitcoinjs-lib": "^3.3.2",
     "commander": "^2.11.0",
     "jsonld": "^0.4.12",
-    "jsonld-signatures": "^2.3.0",
+    "jsonld-signatures": "^2.3.1",
     "txref-conversion-js": "git+https://github.com/WebOfTrustInfo/txref-conversion-js.git",
     "xmlhttprequest": "^1.8.0"
   },
