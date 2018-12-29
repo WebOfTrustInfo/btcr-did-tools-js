@@ -5,6 +5,9 @@ const txRefConversion = require("txref-conversion-js");
 
 
 let BTCR_PREFIX = "did:btcr:";
+let TXREF_MAIN_PREFIX = "tx1:";
+let TXREF_TEST_PREFIX = "txtest1:";
+
 let COMPRESSED_PUBLIC_KEY_BYTE_LEN = 33;
 let COMPRESSED_PUBLIC_KEY_HEX_LEN = COMPRESSED_PUBLIC_KEY_BYTE_LEN * 2;
 
@@ -29,10 +32,16 @@ const ensureTxref = function (txrefCandidate) {
         txref = txrefCandidate.substr(BTCR_PREFIX.length);
     }
 
-    if (!txref.startsWith("txtest") && txref.startsWith("x")) {
-        txref = "txtest1-" + txref;
-    } else if (!txref.startsWith("tx")) {
-        txref = "tx1-" + txref;
+    if (txref.startsWith(TXREF_TEST_PREFIX) || txref.startsWith(TXREF_MAIN_PREFIX)) {
+        return txref;
+    }
+
+    if (txref.startsWith("x") || txref.startsWith("8")) {
+        txref = TXREF_TEST_PREFIX + txref;
+    } else if (txref.startsWith("r") || txref.startsWith("y")) {
+        txref = TXREF_MAIN_PREFIX + txref;
+    } else {
+        throw "this isn't a txref candidate: " + txref;
     }
     return txref;
 };
@@ -43,10 +52,10 @@ const ensureBtcrDid = function (btcrDidCandidate) {
     }
 
     var btcrDid = btcrDidCandidate;
-    if (btcrDid.startsWith("txtest1-")) {
-        btcrDid = btcrDid.substr("txtest1-".length);
-    } else if (btcrDid.startsWith("tx1-")) {
-        btcrDid = btcrDid.substr("tx1-".length);
+    if (btcrDid.startsWith(TXREF_TEST_PREFIX)) {
+        btcrDid = btcrDid.substr(TXREF_TEST_PREFIX.length);
+    } else if (btcrDid.startsWith(TXREF_MAIN_PREFIX)) {
+        btcrDid = btcrDid.substr(TXREF_MAIN_PREFIX.length);
     }
 
     if (!btcrDid.startsWith(BTCR_PREFIX)) {

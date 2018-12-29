@@ -216,8 +216,11 @@ async function resolveFromTxid(txid, chain, utxoIndex=0) {
 // xkyt-fzgq-qq87-xnhn
 // did:btcr:xyv2-xzyq-qqm5-tyke
 
+// did:btcr:txtest1:8kyt-fzzq-qqqq-ase0-d8
+// did:btcr:8kyt-fzzq-qqqq-ase0-d8
+
 /*
-resolveFromTxref("did:btcr:xyv2-xzyq-qqm5-tyke").then(dddo => {
+resolveFromTxref("did:btcr:8kyt-fzzq-qqqq-ase0-d8").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)

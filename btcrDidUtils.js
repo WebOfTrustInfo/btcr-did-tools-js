@@ -352,8 +352,11 @@ async function resolveFromTxid(txid, chain) {
 // xkyt-fzgq-qq87-xnhn
 // did:btcr:xyv2-xzyq-qqm5-tyke
 
+// did:btcr:txtest1:8kyt-fzzq-qqqq-ase0-d8
+// did:btcr:8kyt-fzzq-qqqq-ase0-d8
+
 /*
-resolveFromTxref("did:btcr:xyv2-xzyq-qqm5-tyke").then(dddo => {
+resolveFromTxref("did:btcr:8kyt-fzzq-qqqq-ase0-d8").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
@@ -13419,7 +13422,8 @@ module.exports = class Injector {
 module.exports = {
   SECURITY_CONTEXT_URL: 'https://w3id.org/security/v2',
   SECURITY_CONTEXT_V1_URL: 'https://w3id.org/security/v1',
-  SECURITY_CONTEXT_V2_URL: 'https://w3id.org/security/v2'
+  SECURITY_CONTEXT_V2_URL: 'https://w3id.org/security/v2',
+  SECURITY_PROOF_URL: 'https://w3id.org/security#proof'
 };
 
 },{}],86:[function(require,module,exports){
@@ -14169,7 +14173,8 @@ module.exports = class LinkedDataSignature {
     const opts = {
       algorithm: 'URDNA2015',
       format: 'application/n-quads',
-      expansionMap: options.expansionMap
+      expansionMap: options.expansionMap,
+      skipExpansion: options.skipExpansion === true
     };
     if(options.documentLoader) {
       opts.documentLoader = options.documentLoader;
@@ -14181,27 +14186,26 @@ module.exports = class LinkedDataSignature {
     // TODO: frame before getting signature, not just compact? considerations:
     // should the assumption be (for this library) that the signature is on
     // the top-level object and thus framing is unnecessary?
-
     const jsonld = this.injector.use('jsonld');
     const opts = {expansionMap: options.expansionMap};
     if(options.documentLoader) {
       opts.documentLoader = options.documentLoader;
     }
-    const compacted = await jsonld.compact(
-      input, constants.SECURITY_CONTEXT_URL, opts);
+    const [expanded = {}] = await jsonld.expand(input, opts);
 
     // TODO: will need to preserve `proof` when chained signature
     // option is used and implemented in the future
 
     // delete the existing proofs(s) prior to canonicalization
-    delete compacted.proof;
+    delete expanded[constants.SECURITY_PROOF_URL];
 
     // ensure signature values are removed from proof node
     const proof = await this.sanitizeProofNode(options.proof, options);
 
     // concatenate hash of c14n proof options and hash of c14n document
     const c14nProofOptions = await this.canonize(proof, options);
-    const c14nDocument = await this.canonize(compacted, options);
+    const canonizeOptions = Object.assign({}, options, {skipExpansion: true});
+    const c14nDocument = await this.canonize(expanded, canonizeOptions);
     return {
       data: this._sha256(c14nProofOptions).getBytes() +
         this._sha256(c14nDocument).getBytes(),
@@ -29446,6 +29450,7 @@ let request = obj => {
   return new Promise((resolve, reject) => {
     let request = new XMLHttpRequest();
 
+    request.timeout = 5000;
     request.addEventListener('load', () => {
       if (request.status >= 200 && request.status < 300) {
         resolve(request.responseText);
@@ -29473,12 +29478,15 @@ let request = obj => {
 module.exports = {
   request: request
 }
+
 },{"xmlhttprequest":155}],143:[function(require,module,exports){
 var bech32 = require('./bech32');
 var promisifiedRequests = require('./promisifiedRequests');
 
 let MAGIC_BTC_MAINNET = 0x03;
+let MAGIC_BTC_MAINNET_EXTENDED = 0x04;
 let MAGIC_BTC_TESTNET = 0x06;
+let MAGIC_BTC_TESTNET_EXTENDED = 0x07;
 
 let TXREF_BECH32_HRP_MAINNET = "tx";
 let TXREF_BECH32_HRP_TESTNET = "txtest";
@@ -29489,31 +29497,29 @@ let CHAIN_TESTNET = "testnet";
 
 
 var txrefEncode = function (chain, blockHeight, txPos, utxoIndex) {
-  let magic = chain === CHAIN_MAINNET ? MAGIC_BTC_MAINNET : MAGIC_BTC_TESTNET;
   let prefix = chain === CHAIN_MAINNET ? TXREF_BECH32_HRP_MAINNET : TXREF_BECH32_HRP_TESTNET;
   let nonStandard = chain != CHAIN_MAINNET;
   let extendedTxref = utxoIndex !== undefined;
 
-  var shortId;
+  var magic;
   if(extendedTxref) {
-    shortId = nonStandard ?
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00] : // 13
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]; // 11
+    magic = chain === CHAIN_MAINNET ? MAGIC_BTC_MAINNET_EXTENDED : MAGIC_BTC_TESTNET_EXTENDED;
   } else {
-    shortId = nonStandard ? 
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00] : // 10
-      [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]; // 8
+    magic = chain === CHAIN_MAINNET ? MAGIC_BTC_MAINNET : MAGIC_BTC_TESTNET;
   }
 
-  if (
-    (nonStandard && (blockHeight > 0x1FFFFF || txPos > 0x1FFF || magic > 0x1F))
-    ||
-    (nonStandard && (blockHeight > 0x3FFFFFF || txPos > 0x3FFFF || magic > 0x1F))
-  ) {
+  var shortId;
+  if(extendedTxref) {
+    shortId = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]; // 12
+  } else {
+    shortId = [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]; // 9
+  }
+
+  if (blockHeight > 0xFFFFFF || txPos > 0x7FFF || magic > 0x1F) {
     return null;
   }
 
-  if(extendedTxref && utxoIndex > 0x1FFF) {
+  if(extendedTxref && utxoIndex > 0x7FFF) {
       return null;
   } 
 
@@ -29527,47 +29533,39 @@ var txrefEncode = function (chain, blockHeight, txPos, utxoIndex) {
   shortId[2] |= ((blockHeight & 0x1F0) >> 4);
   shortId[3] |= ((blockHeight & 0x3E00) >> 9);
   shortId[4] |= ((blockHeight & 0x7C000) >> 14);
+  shortId[5] |= ((blockHeight & 0xF80000) >> 19);
 
-  if (nonStandard) {
-    // use extended blockheight (up to 0x3FFFFFF)
-    // use extended txpos (up to 0x3FFFF)
-    shortId[5] |= ((blockHeight & 0xF80000) >> 19);
-    shortId[6] |= ((blockHeight & 0x3000000) >> 24);
+  shortId[6] |=  (txPos & 0x1F);
+  shortId[7] |= ((txPos & 0x3E0) >> 5);
+  shortId[8] |= ((txPos & 0x7C00) >> 10);
 
-    shortId[6] |= ((txPos & 0x7) << 2);
-    shortId[7] |= ((txPos & 0xF8) >> 3);
-    shortId[8] |= ((txPos & 0x1F00) >> 8);
-    shortId[9] |= ((txPos & 0x3E000) >> 13);
-    if(extendedTxref) {
-      shortId[10] |= ((utxoIndex & 0x1F));
-      shortId[11] |= ((utxoIndex & 0x3E0) >> 5);
-      shortId[12] |= ((utxoIndex & 0x1C00) >> 10);
-    }
-  } else {
-    shortId[5] |= ((blockHeight & 0x180000) >> 19);
-    shortId[5] |= ((txPos & 0x7) << 2);
-    shortId[6] |= ((txPos & 0xF8) >> 3);
-    shortId[7] |= ((txPos & 0x1F00) >> 8);
-    if(extendedTxref) {
-      shortId[8] |= ((utxoIndex & 0x1F));
-      shortId[9] |= ((utxoIndex & 0x3E0) >> 5);
-      shortId[10] |= ((utxoIndex & 0x1C00) >> 10);
-    }
+  if(extendedTxref) {
+    shortId[9]  |=  (utxoIndex & 0x1F);
+    shortId[10] |= ((utxoIndex & 0x3E0) >> 5);
+    shortId[11] |= ((utxoIndex & 0x7C00) >> 10);
   }
 
   let result = bech32.encode(prefix, shortId);
 
+  let origLength = result.length;
   let breakIndex = prefix.length + 1;
-  let finalResult = result.substring(0, breakIndex) + "-" +
+  let finalResult = result.substring(0, breakIndex) + ":" +
     result.substring(breakIndex, breakIndex + 4) + "-" +
     result.substring(breakIndex + 4, breakIndex + 8) + "-" +
-    result.substring(breakIndex + 8, breakIndex + 12) + "-" +
-    result.substring(breakIndex + 12, result.length);
+    result.substring(breakIndex + 8, breakIndex + 12) + "-";
+  if(origLength-breakIndex < 16) {
+    finalResult += result.substring(breakIndex + 12, result.length);
+  } else {
+    finalResult += result.substring(breakIndex + 12, breakIndex + 16) + "-" +
+      result.substring(breakIndex + 16, result.length);
+  }
+
   return finalResult;
 };
 
 var txrefDecode = function (bech32Tx) {
   let stripped = bech32Tx.replace(/-/g, '');
+  stripped = stripped.replace(/:/g, '');
 
   let result = bech32.decode(stripped);
   if (result === null) {
@@ -29575,46 +29573,36 @@ var txrefDecode = function (bech32Tx) {
   }
   let buf = result.data;
 
-  let extendedTxref = buf.length == 11 || buf.length == 13;
+  let extendedTxref = buf.length == 12;
 
   let chainMarker = buf[0];
-  let nonStandard = chainMarker != MAGIC_BTC_MAINNET;
-
-  var bStart = (buf[1] >> 1) |
-    (buf[2] << 4) |
-    (buf[3] << 9) |
-    (buf[4] << 14);
 
   var blockHeight = 0;
   var blockIndex = 0;
   var utxoIndex = 0;
 
-  if (nonStandard) {
-    blockHeight = bStart | (buf[5] << 19);
-    blockHeight |= ((buf[6] & 0x03) << 24);
+  blockHeight = (buf[1] >> 1);
+  blockHeight |= (buf[2] << 4);
+  blockHeight |= (buf[3] << 9);
+  blockHeight |= (buf[4] << 14);
+  blockHeight |= (buf[5] << 19);
 
-    blockIndex = (buf[6] & 0x1C) >> 2;
-    blockIndex |= (buf[7] << 3);
-    blockIndex |= (buf[8] << 8);
-    blockIndex |= (buf[9] << 13);
-    if(extendedTxref) {
-      utxoIndex = buf[10];
-      utxoIndex |= (buf[11] << 5);
-      utxoIndex |= (buf[12] << 10);
-    }
-  } else {
-    blockHeight = bStart | ((buf[5] & 0x03) << 19);
-    blockIndex = (buf[5] & 0x1C) >> 2;
-    blockIndex |= (buf[6] << 3);
-    blockIndex |= (buf[7] << 8);
-    if(extendedTxref) {
-      utxoIndex = buf[8];
-      utxoIndex |= (buf[9] << 5);
-      utxoIndex |= (buf[10] << 10);
-    }
+  blockIndex = buf[6];
+  blockIndex |= (buf[7] << 5);
+  blockIndex |= (buf[8] << 10);
+
+  if(extendedTxref) {
+    utxoIndex = buf[9];
+    utxoIndex |= (buf[10] << 5);
+    utxoIndex |= (buf[11] << 10);
   }
 
-  let chain = chainMarker === MAGIC_BTC_MAINNET ? CHAIN_MAINNET : CHAIN_TESTNET;
+  var chain;
+  if(chainMarker === MAGIC_BTC_MAINNET || chainMarker === MAGIC_BTC_MAINNET_EXTENDED) {
+      chain = CHAIN_MAINNET;
+  } else {
+      chain = CHAIN_TESTNET;
+  }
 
   return {
     "blockHeight": blockHeight,
@@ -31976,6 +31964,9 @@ var bitcoin = require('bitcoinjs-lib');
 var txRefConversion = require("txref-conversion-js");
 
 var BTCR_PREFIX = "did:btcr:";
+var TXREF_MAIN_PREFIX = "tx1:";
+var TXREF_TEST_PREFIX = "txtest1:";
+
 var COMPRESSED_PUBLIC_KEY_BYTE_LEN = 33;
 var COMPRESSED_PUBLIC_KEY_HEX_LEN = COMPRESSED_PUBLIC_KEY_BYTE_LEN * 2;
 
@@ -31999,10 +31990,16 @@ var ensureTxref = function ensureTxref(txrefCandidate) {
         txref = txrefCandidate.substr(BTCR_PREFIX.length);
     }
 
-    if (!txref.startsWith("txtest") && txref.startsWith("x")) {
-        txref = "txtest1-" + txref;
-    } else if (!txref.startsWith("tx")) {
-        txref = "tx1-" + txref;
+    if (txref.startsWith(TXREF_TEST_PREFIX) || txref.startsWith(TXREF_MAIN_PREFIX)) {
+        return txref;
+    }
+
+    if (txref.startsWith("x") || txref.startsWith("8")) {
+        txref = TXREF_TEST_PREFIX + txref;
+    } else if (txref.startsWith("r") || txref.startsWith("y")) {
+        txref = TXREF_MAIN_PREFIX + txref;
+    } else {
+        throw "this isn't a txref candidate: " + txref;
     }
     return txref;
 };
@@ -32013,10 +32010,10 @@ var ensureBtcrDid = function ensureBtcrDid(btcrDidCandidate) {
     }
 
     var btcrDid = btcrDidCandidate;
-    if (btcrDid.startsWith("txtest1-")) {
-        btcrDid = btcrDid.substr("txtest1-".length);
-    } else if (btcrDid.startsWith("tx1-")) {
-        btcrDid = btcrDid.substr("tx1-".length);
+    if (btcrDid.startsWith(TXREF_TEST_PREFIX)) {
+        btcrDid = btcrDid.substr(TXREF_TEST_PREFIX.length);
+    } else if (btcrDid.startsWith(TXREF_MAIN_PREFIX)) {
+        btcrDid = btcrDid.substr(TXREF_MAIN_PREFIX.length);
     }
 
     if (!btcrDid.startsWith(BTCR_PREFIX)) {
