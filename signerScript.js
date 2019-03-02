@@ -75,7 +75,7 @@ const signClaim = function (claim, index) {
     let publicKeyHex = publicKeyBuffer.toString('hex');
     let testPublicKeyFriendly = "ecdsa-koblitz-pubkey:" + publicKeyHex;
     let didPathName = randomString();
-    let did = didPathName + ".jsonld";
+    let did = rootPath + didPathName + ".jsonld";
     jsig.sign(claim, {
 	algorithm: 'EcdsaKoblitzSignature2016',
 	privateKeyWif: wif,
