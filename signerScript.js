@@ -66,12 +66,16 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+let rootPath = "https://raw.githubusercontent.com/alfonsoegio/btcr-did-tools-js/master/corpus/test1/";
+
 const signClaim = function (claim, index) {
     let keyPair = bitcoin.ECPair.fromWIF(wif, network);
     keyPair.compressed = true;
     let publicKeyBuffer = keyPair.getPublicKeyBuffer();
     let publicKeyHex = publicKeyBuffer.toString('hex');
     let testPublicKeyFriendly = "ecdsa-koblitz-pubkey:" + publicKeyHex;
+    let didPathName = randomString();
+    let did = didPathName + ".jsonld";
     jsig.sign(claim, {
 	algorithm: 'EcdsaKoblitzSignature2016',
 	privateKeyWif: wif,
@@ -85,7 +89,7 @@ const signClaim = function (claim, index) {
 							process.env.BTC_ADDRESS,
 							null,
 							process.env.WIF,
-							signedDocument["id"],
+							did,
 							0.0001);
 	console.log("TXID");
 	let result = JSON.parse(btcrDid);
