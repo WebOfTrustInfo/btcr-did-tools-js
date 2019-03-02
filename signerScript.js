@@ -40,8 +40,7 @@ function generateClaim(did) {
     let name1 = randomName();
     let name2 = randomName();
     let label = name1 + "-" + "knows" + "-" + name2;
-    // let did = generateDid();
-    let did0 = did + "/0#did-transaction-key"; // /0#did-transaction-key
+    let did0 = did + "/0#did-transaction-key";
     let claimId = did + "/1#" + label;
     let recipientDid = did;
     let relationship = "colleague";
@@ -78,15 +77,6 @@ const signClaim = async function (claim, index) {
     let testPublicKeyFriendly = "ecdsa-koblitz-pubkey:" + publicKeyHex;
     let didPathName = randomString();
     let did = rootPath + didPathName + ".jsonld";
-    // jsig.sign(claim, {
-    // 	algorithm: 'EcdsaKoblitzSignature2016',
-    // 	privateKeyWif: wif,
-    // 	creator: testPublicKeyFriendly
-    // }, async function (err, signedDocument) {
-    // 	if (err) {
-    // 	    console.error(err);
-    // 	    process.exit(1);
-    // 	}
     let btcrDid = await createBtcrDid.createBtcrDid(process.env.BTC_ADDRESS,
 						    process.env.BTC_ADDRESS,
 						    null,
@@ -96,9 +86,6 @@ const signClaim = async function (claim, index) {
     console.log("TXID");
     let result = JSON.parse(btcrDid);
     console.log(result);
-    // await fs.writeFile("corpus/test1/" + didPathName + ".jsonld",
-    // 		   JSON.stringify(signedDocument) , () => {});
-    // console.log("Signed " + signedDocument["id"]);
     setInterval(waitForConfirm, 20000, result["data"]["txid"], didPathName);
 }
 
@@ -128,7 +115,7 @@ async function waitForConfirm(txid, didPathName) {
 	let did = request.txrefEncode(network, blockHeight, txPos, utxoIndex);
 	console.log("DID = " + did);
 	console.log("DID PATHNAME = " + didPathName);
-	let claim = generateClaim(did);
+	let claim = generateClaim("did:" + did);
 	console.log(claim);
 	let testnet = bitcoin.networks.testnet;
 	let keyPair = bitcoin.ECPair.fromWIF(wif, testnet);
@@ -145,18 +132,10 @@ async function waitForConfirm(txid, didPathName) {
 	    privateKeyWif: wif,
 	    creator: testPublicKeyFriendly
 	});
-	// , function (err, signedDocument) {
-	//     console.log("OUT OF SIGNING");
-	//     if (err) {
-	// 	console.log("ERROR SIGNING");
-	// 	console.error(err);
-	// 	process.exit(1);
-	//     }
 	console.log(signedDocument);
 	fs.writeFileSync("corpus/test1/" + didPathName + ".jsonld",
 			 JSON.stringify(signedDocument) , (err) => console.log(err));
 	console.log("Signed " + signedDocument["id"]);
-	// });
 	process.exit(0);
     }
 }
