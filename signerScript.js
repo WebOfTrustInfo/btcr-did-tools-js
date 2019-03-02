@@ -95,7 +95,7 @@ const signClaim = function (claim, index) {
 	let result = JSON.parse(btcrDid);
 	console.log(result);
 	console.log(typeof btcrDid);
-	await fs.writeFile("corpus/test1/tx-" + result["data"]["txid"] + ".jsonld",
+	await fs.writeFile("corpus/test1/" + didPathName + ".jsonld",
 			   JSON.stringify(signedDocument) , () => {});
 	console.log("Signed " + signedDocument["id"]);
     });
