@@ -10,7 +10,7 @@
   "author": "Kim Hamilton Duffy",
   "license": "MIT",
   "dependencies": {
-    "bitcoinjs-lib": "^4.0.3",
+    "bitcoinjs-lib": "3.3.2",
     "commander": "^2.11.0",
     "jsonld": "^0.4.12",
     "jsonld-signatures": "^2.3.1",
