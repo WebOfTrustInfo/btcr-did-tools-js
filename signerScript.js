@@ -5,9 +5,11 @@ const fs = require('fs');
 const createBtcrDid = require('./createBtcrDid');
 const request = require("txref-conversion-js");
 const fetch = require('node-fetch');
+const coinkey = require('coinkey')
+const coininfo = require('coininfo');
+coinkey.versions = coininfo('BTC-TEST')
 
 let network = bitcoin.networks.testnet;
-
 let wif = process.env.WIF;
 
 let names = ["Alice", "Bob", "Charles", "Dan", "Edward", "Fred",
@@ -70,13 +72,14 @@ function sleep(ms) {
 let rootPath = "https://raw.githubusercontent.com/alfonsoegio/btcr-did-tools-js/master/corpus/test1/";
 
 const signClaim = async function (claim, index) {
-    let keyPair = bitcoin.ECPair.fromWIF(wif, network);
-    keyPair.compressed = true;
-    let publicKeyBuffer = keyPair.getPublicKeyBuffer();
-    let publicKeyHex = publicKeyBuffer.toString('hex');
-    let testPublicKeyFriendly = "ecdsa-koblitz-pubkey:" + publicKeyHex;
     let didPathName = randomString();
     let did = rootPath + didPathName + ".jsonld";
+    let newKey = coinkey.createRandom();
+    let newWif = newKey.privateWif;
+    console.log("NEW WIF");
+    console.log(newWif);
+    console.log("NEW WIF");
+    console.log(JSON.stringify(newKey));
     let btcrDid = await createBtcrDid.createBtcrDid(process.env.BTC_ADDRESS,
 						    process.env.BTC_ADDRESS,
 						    null,
@@ -122,7 +125,7 @@ async function waitForConfirm(txid, didPathName) {
 	let testnet = bitcoin.networks.testnet;
 	let keyPair = bitcoin.ECPair.fromWIF(wif, testnet);
 	keyPair.compressed = true;
-	let publicKeyBuffer = keyPair.getPublicKeyBuffer();
+	let publicKeyBuffer = keyPair["__d"];
 	let publicKeyHex = publicKeyBuffer.toString('hex');
 	let testPublicKeyFriendly = "ecdsa-koblitz-pubkey:" + publicKeyHex;
 	console.log("ABOUT TO SIGN");
@@ -134,6 +137,7 @@ async function waitForConfirm(txid, didPathName) {
 	    privateKeyWif: wif,
 	    creator: testPublicKeyFriendly
 	});
+	console.log("Already signed");
 	console.log(signedDocument);
 	fs.writeFileSync("corpus/test1/" + didPathName + ".jsonld",
 			 JSON.stringify(signedDocument) , (err) => console.log(err));
