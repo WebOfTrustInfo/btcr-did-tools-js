@@ -82,7 +82,7 @@ const signClaim = async function (claim, index) {
 						    null,
 						    process.env.WIF,
 						    did,
-						    0.0001);
+						    0.0005);
     console.log("TXID");
     let result = JSON.parse(btcrDid);
     console.log(result);
@@ -114,6 +114,8 @@ async function waitForConfirm(txid, didPathName) {
 	console.log("Network = " + network);
 	let did = request.txrefEncode(network, blockHeight, txPos, utxoIndex);
 	console.log("DID = " + did);
+	let decodedDid = request.txrefDecode(did);
+	console.log("Decoded DID = " + JSON.stringify(decodedDid));
 	console.log("DID PATHNAME = " + didPathName);
 	let claim = generateClaim("did:" + did);
 	console.log(claim);
