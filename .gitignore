@@ -7,3 +7,6 @@ bundle*.js
 
 .DS_Store*
 .DS_Store*
+venv
+
+keys.json

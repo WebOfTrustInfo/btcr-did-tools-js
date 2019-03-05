@@ -10,10 +10,13 @@
   "author": "Kim Hamilton Duffy",
   "license": "MIT",
   "dependencies": {
-    "bitcoinjs-lib": "^3.3.2",
+    "bitcoinjs-lib": "^4.0.3",
+    "coininfo": "^4.4.0",
+    "coinkey": "^3.0.0",
     "commander": "^2.11.0",
     "jsonld": "^0.4.12",
     "jsonld-signatures": "^2.3.1",
+    "node-fetch": "^2.3.0",
     "txref-conversion-js": "git+https://github.com/WebOfTrustInfo/txref-conversion-js.git",
     "xmlhttprequest": "^1.8.0"
   },
@@ -23,6 +26,12 @@
     "babelify": "^7.3.0",
     "brfs": "^1.4.3",
     "browserify": "^14.3.0",
+    "eslint": "^5.15.1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
     "uglify-js": "^3.0.8"
   }
 }
