@@ -66,7 +66,7 @@ transaction details:{
 ### Usage
 
 The default node is testnet; call `--help` for more options
- 
+
 ```
 node createBtcrDid.js --help
 ```
@@ -101,6 +101,19 @@ node utilCmd.js -n <mainnet|testnet>
 
 ```
 
+### Using signerScript.js
+
+Install [https://pypi.org/project/nodeenv/](https://pypi.org/project/nodeenv/)
+in order to use a proper local node version inside repo directory
+avoiding pollution of system wide node dependencies:
+
+```
+$ nodeenv --node 10.15.1 venv
+$ source venv/bin/activate
+(venv) $ export WIF=<valid_wif_key>
+(venv) $ npm install
+(venv) $ node signerScript.js
+```
 
 ### Getting started with Bitcoin and testnet
 
@@ -109,7 +122,7 @@ If you don't have a testnet address yet, and don't know how to create one, you c
 
 As this is a client-side address generator, and will be passing private keys, go ahead and disconnect your internet connection. Even though this is testnet mode, it's a good practice to start following.
 
-Once you've disconnected from the internet and generated a testnet address, record the Bitcoin address (what you can share with the public) and the Private Key (always keep this private). The private key is in Wallet Import Format (WIF). 
+Once you've disconnected from the internet and generated a testnet address, record the Bitcoin address (what you can share with the public) and the Private Key (always keep this private). The private key is in Wallet Import Format (WIF).
 
 ![](img/bitaddress.png)
 
