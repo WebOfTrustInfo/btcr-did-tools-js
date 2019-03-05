@@ -112,6 +112,16 @@ $ nodeenv --node 10.15.1 venv
 $ source venv/bin/activate
 (venv) $ export WIF=<valid_wif_key>
 (venv) $ npm install
+```
+
+The script only needs WIF environment variable the first time it runs.
+From that point, it keeps generating new WIFs as private keys for change
+destinations storing them in keys.json at repo base directory.
+Take into account that in case file writing operation fails or the file
+gets corrupted, the UTXO corresponding to current WIF will be locked forever.
+So use only on testnet (harcoded anyway) and with addresses with low balances.
+
+```
 (venv) $ node signerScript.js
 ```
 

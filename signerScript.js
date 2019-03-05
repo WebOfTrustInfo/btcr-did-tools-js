@@ -67,11 +67,14 @@ const checkLastAddress = async function () {
 // Saves new UTXO WIF on the wallet
 const saveNewAddress = async function (wif) {
   let path = './keys.json'
+  let content = null
   if (fs.existsSync(path)) {
-    let content = JSON.parse(fs.readFileSync(path))
-    content['keys'].push(wif)
-    fs.writeFileSync(path, JSON.stringify(content))
+    content = JSON.parse(fs.readFileSync(path))
+  } else {
+    content = { 'keys': [] }
   }
+  content['keys'].push(wif)
+  fs.writeFileSync(path, JSON.stringify(content))
 }
 
 // Main claim signer function
@@ -108,7 +111,7 @@ async function waitForConfirm (txid, ddoPathName, wif) {
   let response = await fetch('https://chain.so/api/v2/tx/BTCTEST/' + txid)
   let tx = await response.json()
   if (tx['data']['block_no'] == null) {
-    console.log('Waiting form confirmation ...')
+    console.log('Waiting for confirmation ...')
   }
   if (tx['data']['block_no'] != null) {
     // TX has block number
