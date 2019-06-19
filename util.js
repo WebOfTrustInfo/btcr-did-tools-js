@@ -107,6 +107,13 @@ const publicKeyHexFromWif = function (wif, network) {
     return publicKeyHex;
 };
 
+/*
+txDetailsFromTxref("did:btcr:xyv2-xzpq-q9wa-p7t").then(dddo => {
+    console.log(JSON.stringify(dddo, null, 4));
+}, error => {
+    console.error(error)
+});*/
+
 module.exports = {
     ensureTxref: ensureTxref,
     extractPublicKeyHexFromScript: extractPublicKeyHexFromScript,

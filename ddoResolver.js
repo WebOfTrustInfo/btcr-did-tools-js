@@ -99,9 +99,7 @@ async function addSupplementalDidDocuments(implicitDdo, txDetails, txref) {
 
 async function retrieveEndpointFragments(ddoUrl) {
     let ddo1 = await txRefConversion.promisifiedRequest({"url": ddoUrl});
-    let ddoJson = JSON.parse(ddo1).didDocument;
-    let vcJson = JSON.parse(ddo1).claims;
-    return [ddoJson, vcJson];
+    return [ddo1];
 }
 
 
@@ -112,7 +110,7 @@ async function retrieveEndpointFragments(ddoUrl) {
  * @param txref
  * @returns {{@context: string, id: string, publicKey: [null], authentication: [null], SatoshiAuditTrail: [null]}}
  */
-function toImplicitDidDocument(txDetails, txref) {
+async function toImplicitDidDocument(txDetails, txref) {
     if (!txDetails) {
         throw "Missing txDetails argument";
     }
@@ -120,74 +118,63 @@ function toImplicitDidDocument(txDetails, txref) {
         throw "Missing txref argument";
     }
 
-    const result = {
+    /*const ddoResult = {
         "@context": ["https://schema.org/", "https://w3id.org/security/v1"]
-    };
+    };*/
+
+    let ddoResult = {};
 
     let btcrDid = txref;
     let fundingScript = txDetails.inputs[0].script;
     let publicKeyHex = util.extractPublicKeyHexFromScript(fundingScript).toString();
     let ddoUrl = txDetails.outputs.filter((o) => o.dataString).map(e => e.dataString).find(f => f);
 
-    let ddoJson = {
-        "@context": "https://w3id.org/btcr/v1",
-        "id": btcrDid,
-        "publicKey": [{
-            "id": btcrDid + "#keys-1",
-            "owner": btcrDid,
-            "type": "EdDsaSAPublicKeySecp256k1",
-            "publicKeyHex": publicKeyHex.toString()
-        }],
-        "authentication": [{
-            "type": "EdDsaSAPublicKeySecp256k1Authentication",
-            "publicKey": "#keys-1"
-        }],
-        "SatoshiAuditTrail": [{
-            "chain": txDetails.chain,
-            "blockhash": txDetails.blockHash,
-            "blockindex": txDetails.blockIndex,
-            "outputindex": txDetails.utxoIndex,
-            "blocktime": txDetails.txReceived,
-            "time": 1499501000,
-            "timereceived": txDetails.txReceived,
-            "burn-fee": -0.05
-        }]
-    };
-
     if (ddoUrl) {
-        ddoJson.service = [{
-            "type": "BTCREndpoint",
-            "serviceEndpoint": ddoUrl,
-            "timestamp": txDetails.timereceived // TODO
-        }];
+        let explicitDdoRaw = await retrieveEndpointFragments(ddoUrl);
+        try {
+            let explicitDdo = JSON.parse(explicitDdoRaw);
+            ddoResult['explicitDdo'] = explicitDdo;
+        } catch (e) {
+            ddoResult['raw'] = explicitDdoRaw;
+            ddoResult['error'] = e.toString();
+        }
+    } else {
+        ddoResult['implicitDdo']  = {
+            "@context": "https://w3id.org/btcr/v1",
+            "id": btcrDid,
+            "publicKey": [{
+                "id": btcrDid + "#keys-1",
+                "owner": btcrDid,
+                "type": "EcdsaSecp256k1VerificationKey2019",
+                "publicKeyHex": publicKeyHex.toString()
+            }],
+            "authentication": [{
+                "type": "EcdsaSecp256k1VerificationKey2019",
+                "publicKey": "#keys-1"
+            }],
+            "SatoshiAuditTrail": [{
+                "chain": txDetails.chain,
+                "blockhash": txDetails.blockHash,
+                "blockindex": txDetails.blockIndex,
+                "outputindex": txDetails.utxoIndex,
+                "blocktime": txDetails.txReceived,
+                "time": 1499501000,
+                "timereceived": txDetails.txReceived,
+                "burn-fee": -0.05
+            }]
+        };
     }
 
-    return ddoJson;
+    return ddoResult;
 }
 
 async function toDidDocument(txDetails, txref) {
-    let implicitDdo = toImplicitDidDocument(txDetails, txref);
-    let implicitDdoCopy = JSON.parse(JSON.stringify(implicitDdo));
+    let ddoResult = await toImplicitDidDocument(txDetails, txref);
 
     let result = {
         "txDetails": txDetails,
-        "ddophase1": implicitDdo
+        "ddoResult": ddoResult
     };
-
-    if (implicitDdo.service && implicitDdo.service.length == 1 && implicitDdo.service[0].serviceEndpoint) {
-        let endpointJson = await retrieveEndpointFragments(implicitDdo.service[0].serviceEndpoint);
-        let ddoJson = endpointJson[0];
-        let vcJson = endpointJson[1];
-        result.vc = vcJson
-        result.ddophase2 = ddoJson;
-        let ddo = await addSupplementalDidDocuments(implicitDdoCopy, txDetails, txref);
-        result.ddo = ddo;
-        result.ddophase3 = ddo;
-
-    } else {
-        result.ddo = implicitDdoCopy;
-        result.ddophase3 = implicitDdoCopy;
-    }
 
     return result;
 }
@@ -213,21 +200,15 @@ async function resolveFromTxid(txid, chain, utxoIndex=0) {
     return deterministicDid;
 }
 
-// xkyt-fzgq-qq87-xnhn
-// did:btcr:xyv2-xzyq-qqm5-tyke
-
-// did:btcr:txtest1:8kyt-fzzq-qqqq-ase0-d8
-// did:btcr:8kyt-fzzq-qqqq-ase0-d8
-
 /*
-resolveFromTxref("did:btcr:8kyt-fzzq-qqqq-ase0-d8").then(dddo => {
-  console.log(JSON.stringify(dddo, null, 4));
+resolveFromTxref("did:btcr:xyv2-xzpq-q9wa-p7t").then(dddo => {
+    console.log(JSON.stringify(dddo, null, 4));
 }, error => {
-  console.error(error)
+    console.error(error)
 });*/
 
 /*
-resolveFromTxid("f8cdaff3ebd9e862ed5885f8975489090595abe1470397f79780ead1c7528107", "testnet").then(dddo => {
+resolveFromTxid("11d8023bd6ef3afc621a019d939345d31a5afa65c93dd4aab6af5feb6a55f4f2", "mainnet").then(dddo => {
   console.log(JSON.stringify(dddo, null, 4));
 }, error => {
   console.error(error)
