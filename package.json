@@ -15,7 +15,8 @@
     "jsonld": "^0.4.12",
     "jsonld-signatures": "^2.3.1",
     "txref-conversion-js": "git+https://github.com/WebOfTrustInfo/txref-conversion-js.git",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "node-forge": "0.8.5"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
