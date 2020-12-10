@@ -2,6 +2,8 @@
 
 const txRefConversion = require("txref-conversion-js");
 const util = require("./util");
+const forge = require('node-forge');
+const {util: {binary: {base58}}} = forge;
 
 
 var keyCounter = 1;
@@ -127,6 +129,7 @@ async function toImplicitDidDocument(txDetails, txref) {
     let btcrDid = txref;
     let fundingScript = txDetails.inputs[0].script;
     let publicKeyHex = util.extractPublicKeyHexFromScript(fundingScript).toString();
+    let publicKeyBase58 = base58.encode(new Buffer(publicKeyHex, "hex"));
     let ddoUrl = txDetails.outputs.filter((o) => o.dataString).map(e => e.dataString).find(f => f);
 
     if (ddoUrl) {
@@ -143,15 +146,18 @@ async function toImplicitDidDocument(txDetails, txref) {
             "@context": "https://w3id.org/btcr/v1",
             "id": btcrDid,
             "publicKey": [{
-                "id": btcrDid + "#keys-1",
-                "owner": btcrDid,
+                "id": btcrDid + "#satoshi",
+                "controller": btcrDid,
                 "type": "EcdsaSecp256k1VerificationKey2019",
-                "publicKeyHex": publicKeyHex.toString()
-            }],
-            "authentication": [{
+                "publicKeyBase58": publicKeyBase58
+            }, {
+                "id": btcrDid + "#vckey-0",
+                "controller": btcrDid,
                 "type": "EcdsaSecp256k1VerificationKey2019",
-                "publicKey": "#keys-1"
+                "publicKeyBase58": publicKeyBase58
             }],
+            "authentication": ['#satoshi'],
+            "assertionMethod": ["#vckey-0"],
             "SatoshiAuditTrail": [{
                 "chain": txDetails.chain,
                 "blockhash": txDetails.blockHash,
